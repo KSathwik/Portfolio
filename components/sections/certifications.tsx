@@ -2,14 +2,25 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Award, ExternalLink } from "lucide-react";
+import { Award } from "lucide-react";
 
 const certifications = [
   {
+    title: "Agentic AI",
+    issuer: "DeepLearning.AI – Andrew Ng",
+    status: "Completed",
+    inProgress: false,
+    highlights: [
+      "Reflection, Tool Use, Planning & Multi-Agent Workflows",
+      "AI integration with databases, APIs & web search",
+      "Production deployment & evaluation",
+    ],
+  },
+  {
     title: "IBM Generative AI Engineering Professional Certificate",
-    issuer: "IBM",
-    status: "In Progress",
-    inProgress: true,
+    issuer: "IBM – Coursera",
+    status: "Completed",
+    inProgress: false,
   },
 ];
 
@@ -52,14 +63,31 @@ export function Certifications() {
                     className="text-muted-foreground group-hover:text-foreground transition-colors"
                   />
                 </div>
-                {cert.inProgress && (
+                {cert.inProgress ? (
                   <span className="px-2.5 py-1 text-[10px] font-medium text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-full">
                     In Progress
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-1 text-[10px] font-medium text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                    Completed
                   </span>
                 )}
               </div>
               <h3 className="text-sm font-semibold mb-1">{cert.title}</h3>
-              <p className="text-xs text-muted-foreground">{cert.issuer}</p>
+              <p className="text-xs text-muted-foreground mb-3">{cert.issuer}</p>
+              {"highlights" in cert && cert.highlights && (
+                <ul className="space-y-1.5">
+                  {cert.highlights.map((item, i) => (
+                    <li
+                      key={i}
+                      className="text-[11px] text-muted-foreground flex items-start gap-2"
+                    >
+                      <span className="w-1 h-1 rounded-full bg-muted-foreground/50 mt-1.5 shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </motion.div>
           ))}
         </div>

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowDown, FileDown, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const techBadges = [
   "Python",
@@ -63,6 +64,23 @@ export function Hero() {
       </div>
 
       <div className="max-w-4xl mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="mb-6 flex justify-center"
+        >
+          <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-2 border-border/50 shadow-lg">
+            <Image
+              src="https://github.com/KSathwik.png"
+              alt="Sathwik Katkam"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

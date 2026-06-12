@@ -80,7 +80,7 @@ const experiences = [
     company: "Venago Innovations",
     role: "Python Developer Intern",
     duration: "June 2024 – September 2024",
-    location: "Remote",
+    location: "Hyderabad, India",
     current: false,
     projects: [
       {
