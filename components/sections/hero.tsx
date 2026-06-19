@@ -55,7 +55,7 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center px-4 sm:px-6 lg:px-8 overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden pt-20"
     >
       {/* Hero-specific radial glow */}
       <div className="absolute inset-0 -z-10">
@@ -63,10 +63,10 @@ export function Hero() {
         <div className="absolute bottom-1/4 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-indigo-500/[0.06] via-purple-500/[0.03] to-transparent rounded-full blur-3xl dark:from-indigo-500/[0.04] dark:via-purple-500/[0.02]" />
       </div>
 
-      <div className="max-w-6xl mx-auto w-full py-20 lg:py-0">
-        <div className="grid lg:grid-cols-[1fr,auto] gap-12 lg:gap-16 items-center">
+      <div className="max-w-6xl mx-auto w-full">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-center">
           {/* Left: Text Content */}
-          <div className="order-2 lg:order-1">
+          <div className="flex-1 order-2 lg:order-1">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -168,20 +168,20 @@ export function Hero() {
             initial={{ opacity: 0, scale: 0.9, x: 20 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
-            className="order-1 lg:order-2 flex justify-center lg:justify-end"
+            className="order-1 lg:order-2 shrink-0"
           >
-            <div className="relative">
+            <div className="relative flex items-center justify-center">
               {/* Decorative rings */}
-              <div className="absolute -inset-4 rounded-full border border-border/20 dark:border-border/10" />
-              <div className="absolute -inset-8 rounded-full border border-border/10 dark:border-border/5" />
-              <div className="absolute -inset-12 rounded-full border border-border/5 dark:border-border/[0.02]" />
+              <div className="absolute -inset-5 rounded-full border border-border/20 dark:border-border/10" />
+              <div className="absolute -inset-10 rounded-full border border-border/10 dark:border-border/5" />
+              <div className="absolute -inset-16 rounded-full border border-border/[0.06] dark:border-border/[0.03] hidden sm:block" />
 
               {/* Gradient glow behind image */}
-              <div className="absolute -inset-4 bg-gradient-to-br from-violet-500/20 via-blue-500/10 to-indigo-500/20 rounded-full blur-2xl dark:from-violet-500/10 dark:via-blue-500/5 dark:to-indigo-500/10" />
+              <div className="absolute -inset-6 bg-gradient-to-br from-violet-500/15 via-blue-500/10 to-indigo-500/15 rounded-full blur-2xl dark:from-violet-500/10 dark:via-blue-500/5 dark:to-indigo-500/10" />
 
               {/* Profile image with animated ring */}
-              <div className="profile-ring rounded-full relative">
-                <div className="relative w-40 h-40 sm:w-48 sm:h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden bg-background">
+              <div className="profile-ring rounded-full relative z-10">
+                <div className="relative w-44 h-44 sm:w-52 sm:h-52 lg:w-60 lg:h-60 rounded-full overflow-hidden bg-background">
                   <Image
                     src="https://github.com/KSathwik.png"
                     alt="Sathwik Katkam"
@@ -194,19 +194,40 @@ export function Hero() {
 
               {/* Floating accent dots */}
               <motion.div
-                animate={{ y: [-5, 5, -5] }}
+                animate={{ y: [-6, 6, -6] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-2 -right-2 w-3 h-3 rounded-full bg-violet-500/40 blur-[1px]"
+                className="absolute -top-3 -right-3 w-3 h-3 rounded-full bg-violet-500/50 blur-[2px]"
               />
               <motion.div
-                animate={{ y: [5, -5, 5] }}
+                animate={{ y: [6, -6, 6] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -bottom-2 -left-2 w-2.5 h-2.5 rounded-full bg-blue-500/40 blur-[1px]"
+                className="absolute -bottom-3 -left-3 w-2.5 h-2.5 rounded-full bg-blue-500/50 blur-[2px]"
+              />
+              <motion.div
+                animate={{ x: [-4, 4, -4] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute top-1/2 -right-6 w-2 h-2 rounded-full bg-indigo-500/40 blur-[1px]"
               />
             </div>
           </motion.div>
         </div>
       </div>
+
+      {/* Scroll indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5, duration: 0.6 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2"
+      >
+        <motion.div
+          animate={{ y: [0, 6, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="w-5 h-8 rounded-full border border-border/50 flex items-start justify-center p-1.5"
+        >
+          <div className="w-1 h-1.5 rounded-full bg-muted-foreground" />
+        </motion.div>
+      </motion.div>
     </section>
   );
 }
