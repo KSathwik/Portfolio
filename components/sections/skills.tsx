@@ -91,7 +91,7 @@ export function Skills() {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: index * 0.08 }}
               whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="p-6 rounded-xl border border-border/50 bg-card/50 hover:border-border hover:bg-card transition-all group"
+              className="card-glow p-6 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm hover:border-border hover:bg-card/80 transition-all group"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-9 h-9 rounded-lg bg-accent/50 border border-border/50 flex items-center justify-center group-hover:border-border transition-colors">

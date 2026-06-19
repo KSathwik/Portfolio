@@ -86,7 +86,7 @@ export function About() {
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                 whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                className="p-5 rounded-xl border border-border/50 bg-card/50 hover:border-border hover:bg-card transition-all"
+                className="card-glow p-5 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm hover:border-border hover:bg-card/80 transition-all"
               >
                 <item.icon className="w-5 h-5 text-muted-foreground mb-3" />
                 <h3 className="text-sm font-medium mb-1">{item.title}</h3>

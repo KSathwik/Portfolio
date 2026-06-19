@@ -5,7 +5,7 @@ import { GitHubIcon, LinkedInIcon } from "@/components/icons";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/50 py-8 px-4 sm:px-6 lg:px-8">
+    <footer className="border-t border-border/30 py-8 px-4 sm:px-6 lg:px-8 bg-card/30 backdrop-blur-sm">
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-sm text-muted-foreground">
           &copy; {new Date().getFullYear()} Sathwik Katkam. All rights reserved.

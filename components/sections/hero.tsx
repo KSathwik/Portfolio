@@ -57,10 +57,9 @@ export function Hero() {
       id="hero"
       className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
-      {/* Background gradient */}
+      {/* Hero-specific radial glow */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/3 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-b from-violet-500/[0.08] via-blue-500/[0.04] to-transparent rounded-full blur-3xl dark:from-violet-500/[0.06] dark:via-blue-500/[0.03]" />
       </div>
 
       <div className="max-w-4xl mx-auto text-center">
@@ -70,14 +69,16 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="mb-6 flex justify-center"
         >
-          <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-2 border-border/50 shadow-lg">
-            <Image
-              src="https://github.com/KSathwik.png"
-              alt="Sathwik Katkam"
-              fill
-              className="object-cover"
-              priority
-            />
+          <div className="profile-ring rounded-full">
+            <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-background">
+              <Image
+                src="https://github.com/KSathwik.png"
+                alt="Sathwik Katkam"
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
           </div>
         </motion.div>
 

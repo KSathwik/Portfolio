@@ -172,7 +172,7 @@ export function Experience() {
                       delay: 0.3 + expIndex * 0.15 + projIndex * 0.1,
                     }}
                     whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                    className="p-5 rounded-xl border border-border/50 bg-card/50 hover:border-border hover:bg-card transition-all group"
+                    className="card-glow p-5 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm hover:border-border hover:bg-card/80 transition-all group"
                   >
                     <h4 className="text-sm font-semibold mb-2 group-hover:text-foreground">
                       {project.name}

@@ -143,3 +143,66 @@
     @apply py-24 md:py-32;
   }
 }
+
+/* Enhanced card hover glow */
+.card-glow {
+  position: relative;
+}
+.card-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    transparent 20%,
+    oklch(0.7 0.1 270 / 0.15) 50%,
+    transparent 80%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.card-glow:hover::before {
+  opacity: 1;
+}
+
+/* Section divider gradient line */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border) 20%,
+    var(--border) 80%,
+    transparent
+  );
+}
+
+/* Animated gradient border for profile image */
+@keyframes rotate-gradient {
+  0% { --angle: 0deg; }
+  100% { --angle: 360deg; }
+}
+
+.profile-ring {
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    oklch(0.6 0.15 270),
+    oklch(0.6 0.15 200),
+    oklch(0.6 0.15 330),
+    oklch(0.6 0.15 270)
+  );
+  animation: rotate-gradient 4s linear infinite;
+  padding: 3px;
+}
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
