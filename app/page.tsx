@@ -4,6 +4,8 @@ import { Navigation } from "@/components/navigation";
 import { ScrollProgress } from "@/components/scroll-progress";
 import { LoadingScreen } from "@/components/loading-screen";
 import { Background } from "@/components/background";
+import { CursorGlow } from "@/components/cursor-glow";
+import { BackToTop } from "@/components/back-to-top";
 import { Hero } from "@/components/sections/hero";
 import { About } from "@/components/sections/about";
 import { Experience } from "@/components/sections/experience";
@@ -19,6 +21,7 @@ export default function Home() {
     <>
       <LoadingScreen />
       <Background />
+      <CursorGlow />
       <ScrollProgress />
       <Navigation />
       <main>
@@ -39,6 +42,7 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
+      <BackToTop />
     </>
   );
 }

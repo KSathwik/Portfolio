@@ -9,6 +9,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { GitHubIcon, LinkedInIcon } from "@/components/icons";
+import { TextReveal } from "@/components/text-reveal";
 
 const socialLinks = [
   {
@@ -52,21 +53,18 @@ export function Contact() {
   return (
     <section id="contact" className="section-padding px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto" ref={ref}>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="mb-16"
-        >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+        <div className="mb-16">
+          <TextReveal as="h2" className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
             Get in Touch
-          </h2>
-          <div className="w-12 h-[2px] bg-foreground/20 mb-4" />
-          <p className="text-muted-foreground max-w-lg">
+          </TextReveal>
+          <TextReveal delay={0.1}>
+            <div className="w-12 h-[2px] bg-foreground/20 mb-4" />
+          </TextReveal>
+          <TextReveal as="p" delay={0.2} className="text-muted-foreground max-w-lg">
             I&apos;m open to new opportunities and collaborations. Feel free to
             reach out if you&apos;d like to discuss a project or just connect.
-          </p>
-        </motion.div>
+          </TextReveal>
+        </div>
 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
           {/* Contact Form */}

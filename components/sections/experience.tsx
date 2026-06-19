@@ -3,6 +3,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Briefcase, Calendar, MapPin } from "lucide-react";
+import { TextReveal } from "@/components/text-reveal";
 
 const experiences = [
   {
@@ -112,17 +113,14 @@ export function Experience() {
   return (
     <section id="experience" className="section-padding px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto" ref={ref}>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="mb-16"
-        >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+        <div className="mb-16">
+          <TextReveal as="h2" className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
             Experience
-          </h2>
-          <div className="w-12 h-[2px] bg-foreground/20" />
-        </motion.div>
+          </TextReveal>
+          <TextReveal delay={0.1}>
+            <div className="w-12 h-[2px] bg-foreground/20" />
+          </TextReveal>
+        </div>
 
         <div className="space-y-12">
           {experiences.map((exp, expIndex) => (

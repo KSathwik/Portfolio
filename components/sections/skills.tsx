@@ -10,6 +10,7 @@ import {
   Shield,
   Wrench,
 } from "lucide-react";
+import { TextReveal } from "@/components/text-reveal";
 
 const skillCategories = [
   {
@@ -71,17 +72,14 @@ export function Skills() {
   return (
     <section id="skills" className="section-padding px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto" ref={ref}>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="mb-16"
-        >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Skills & Technologies
-          </h2>
-          <div className="w-12 h-[2px] bg-foreground/20" />
-        </motion.div>
+        <div className="mb-16">
+          <TextReveal as="h2" className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+            Skills &amp; Technologies
+          </TextReveal>
+          <TextReveal delay={0.1}>
+            <div className="w-12 h-[2px] bg-foreground/20" />
+          </TextReveal>
+        </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {skillCategories.map((category, index) => (

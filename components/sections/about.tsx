@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
 import { Code2, Brain, Server, Shield } from "lucide-react";
+import { TextReveal } from "@/components/text-reveal";
 
 const highlights = [
   {
@@ -48,30 +49,25 @@ export function About() {
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="space-y-5"
-          >
-            <p className="text-muted-foreground leading-relaxed">
+          <div className="space-y-5">
+            <TextReveal as="p" delay={0.1} className="text-muted-foreground leading-relaxed">
               Associate Software Engineer with 1 year of experience in backend
               development, Generative AI, and enterprise application development.
               Experienced in building AI-powered solutions using
               Retrieval-Augmented Generation (RAG), semantic search, vector
               databases, Salesforce integrations, and multi-agent AI workflows.
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
+            </TextReveal>
+            <TextReveal as="p" delay={0.2} className="text-muted-foreground leading-relaxed">
               Skilled in Python, FastAPI, LangChain, FAISS, React, Azure, and
               modern software development practices. My work includes developing
               an AI-powered Support Ticket Assistant and building a multi-agent
               AI Email Orchestration System.
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
+            </TextReveal>
+            <TextReveal as="p" delay={0.3} className="text-muted-foreground leading-relaxed">
               Passionate about backend engineering, cloud technologies,
               application security, and building scalable AI-driven solutions.
-            </p>
-          </motion.div>
+            </TextReveal>
+          </div>
 
           <motion.div
             initial={{ opacity: 0, y: 30 }}
