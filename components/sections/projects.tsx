@@ -7,6 +7,27 @@ import { GitHubIcon } from "@/components/icons";
 
 const projects = [
   {
+    title: "AI Knowledge Assistant (Exam Prep Bot)",
+    description:
+      "Production-ready AI Knowledge Assistant featuring Hybrid RAG (FAISS + BM25), Context-Aware Generation (CAG), and Multi-Agent Reflection pipelines supporting Claude, OpenAI, Gemini, and Ollama.",
+    technologies: [
+      "Python",
+      "FastAPI",
+      "React",
+      "FAISS",
+      "BM25",
+      "Docker",
+      "Ollama",
+      "PostgreSQL",
+    ],
+    category: "AI/ML",
+    highlights: [
+      "Hybrid RAG + CAG",
+      "Multi-Agent System",
+      "Multi-LLM Support",
+    ],
+  },
+  {
     title: "Support Ticket AI Assistant",
     description:
       "AI-powered Support Ticket Assistant using RAG, semantic search, and vector databases. Integrates with Salesforce for ticket management and supports multiple LLM providers.",
