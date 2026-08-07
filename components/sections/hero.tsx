@@ -71,11 +71,11 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="mb-5"
+              className="mb-6"
             >
-              <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-muted-foreground bg-accent/50 border border-border/50 rounded-full">
+              <span className="anthropic-tag inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-secondary/80 border border-border">
                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                Available for opportunities
+                ASSOCIATE SOFTWARE ENGINEER
               </span>
             </motion.div>
 
@@ -83,62 +83,58 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl font-bold tracking-tight mb-3"
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-7xl font-serif tracking-tight mb-4 text-foreground"
             >
-              Sathwik Katkam
+              Building intelligent, reliable AI systems.
             </motion.h1>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="h-8 sm:h-9 mb-5"
+              className="h-8 sm:h-9 mb-6 font-mono text-xs uppercase tracking-widest text-muted-foreground"
             >
-              <span className="text-lg sm:text-xl md:text-2xl text-muted-foreground font-light">
-                {displayText}
-                <span className="animate-pulse">|</span>
-              </span>
+              <span>Sathwik Katkam — </span>
+              <span>{displayText}</span>
+              <span className="animate-pulse">_</span>
             </motion.div>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-base sm:text-lg text-muted-foreground max-w-xl mb-8 leading-relaxed"
+              className="text-base sm:text-lg text-muted-foreground max-w-xl mb-10 leading-relaxed font-sans"
             >
-              Backend Developer specializing in Generative AI, Retrieval-Augmented
-              Generation (RAG), and Enterprise Application Development. Building
-              AI-powered applications, scalable backend systems, and intelligent
-              automation solutions.
+              Specializing in Generative AI, Retrieval-Augmented Generation (RAG), and Enterprise Platform Engineering. Crafting autonomous agents, scalable backends, and multi-provider LLM applications.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="flex flex-wrap items-center gap-3 mb-10"
+              className="flex flex-wrap items-center gap-3.5 mb-10"
             >
               <a
                 href="#projects"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                className="anthropic-pill bg-foreground text-background hover:opacity-90 shadow-sm"
               >
-                View Projects
-                <ArrowDown size={16} />
+                Explore Projects
+                <ArrowDown size={14} className="ml-2 inline" />
               </a>
               <a
                 href="/resume.pdf"
                 download
-                className="inline-flex items-center gap-2 px-5 py-2.5 border border-border text-sm font-medium rounded-lg hover:bg-accent transition-colors"
+                className="anthropic-pill bg-secondary text-foreground hover:bg-muted border border-border"
               >
-                <FileDown size={16} />
-                Download Resume
+                <FileDown size={14} className="mr-2 inline" />
+                Resume
               </a>
               <a
                 href="#contact"
-                className="inline-flex items-center gap-2 px-5 py-2.5 border border-border text-sm font-medium rounded-lg hover:bg-accent transition-colors"
+                className="anthropic-pill bg-secondary text-foreground hover:bg-muted border border-border"
               >
-                <Mail size={16} />
-                Contact Me
+                <Mail size={14} className="mr-2 inline" />
+                Contact
               </a>
             </motion.div>
 

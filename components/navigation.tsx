@@ -38,13 +38,13 @@ export function Navigation() {
           : "bg-transparent"
       }`}
     >
-      <nav className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <nav className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         <motion.a
           href="#"
-          className="text-lg font-semibold tracking-tight"
+          className="text-lg font-serif font-bold tracking-wider text-foreground"
           whileHover={{ scale: 1.02 }}
         >
-          SK<span className="text-muted-foreground">.</span>
+          SATHWIK\K
         </motion.a>
 
         <div className="hidden md:flex items-center gap-1">
@@ -52,7 +52,7 @@ export function Navigation() {
             <a
               key={item.href}
               href={item.href}
-              className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
+              className="px-3.5 py-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-secondary"
             >
               {item.label}
             </a>
@@ -60,12 +60,18 @@ export function Navigation() {
           {mounted && (
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="ml-2 p-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+              className="ml-2 p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Toggle theme"
             >
-              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
             </button>
           )}
+          <a
+            href="#contact"
+            className="ml-3 anthropic-pill bg-foreground text-background text-[10px] px-4 py-2 hover:opacity-90"
+          >
+            Get in touch
+          </a>
         </div>
 
         <div className="flex md:hidden items-center gap-2">

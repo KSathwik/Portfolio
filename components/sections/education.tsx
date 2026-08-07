@@ -41,10 +41,10 @@ export function Education() {
           transition={{ duration: 0.6 }}
           className="mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+          <div className="anthropic-tag mb-3">05 / ACADEMIC BACKGROUND</div>
+          <h2 className="text-4xl sm:text-5xl font-serif tracking-tight mb-4">
             Education
           </h2>
-          <div className="w-12 h-[2px] bg-foreground/20" />
         </motion.div>
 
         <div className="space-y-4 max-w-2xl">

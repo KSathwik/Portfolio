@@ -114,11 +114,9 @@ export function Experience() {
     <section id="experience" className="section-padding px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto" ref={ref}>
         <div className="mb-16">
-          <TextReveal as="h2" className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Experience
-          </TextReveal>
-          <TextReveal delay={0.1}>
-            <div className="w-12 h-[2px] bg-foreground/20" />
+          <div className="anthropic-tag mb-3">03 / EXPERIENCE</div>
+          <TextReveal as="h2" className="text-4xl sm:text-5xl font-serif tracking-tight mb-4">
+            Professional Work
           </TextReveal>
         </div>
 

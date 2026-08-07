@@ -54,11 +54,9 @@ export function Contact() {
     <section id="contact" className="section-padding px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto" ref={ref}>
         <div className="mb-16">
-          <TextReveal as="h2" className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Get in Touch
-          </TextReveal>
-          <TextReveal delay={0.1}>
-            <div className="w-12 h-[2px] bg-foreground/20 mb-4" />
+          <div className="anthropic-tag mb-3">06 / CONTACT</div>
+          <TextReveal as="h2" className="text-4xl sm:text-5xl font-serif tracking-tight mb-4">
+            Initiate Conversation
           </TextReveal>
           <TextReveal as="p" delay={0.2} className="text-muted-foreground max-w-lg">
             I&apos;m open to new opportunities and collaborations. Feel free to
@@ -134,7 +132,7 @@ export function Contact() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="anthropic-pill bg-foreground text-background hover:opacity-90 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   "Sending..."

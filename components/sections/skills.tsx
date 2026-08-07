@@ -73,11 +73,9 @@ export function Skills() {
     <section id="skills" className="section-padding px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto" ref={ref}>
         <div className="mb-16">
-          <TextReveal as="h2" className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Skills &amp; Technologies
-          </TextReveal>
-          <TextReveal delay={0.1}>
-            <div className="w-12 h-[2px] bg-foreground/20" />
+          <div className="anthropic-tag mb-3">04 / SKILLS & CAPABILITIES</div>
+          <TextReveal as="h2" className="text-4xl sm:text-5xl font-serif tracking-tight mb-4">
+            Technical Matrix
           </TextReveal>
         </div>
 

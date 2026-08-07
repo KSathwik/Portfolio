@@ -8,8 +8,9 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-serif);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,72 +50,48 @@
 }
 
 :root {
-  --background: oklch(0.99 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  /* Anthropic Warm Ivory Theme (Light) */
+  --background: #FAF9F5;
+  --foreground: #191919;
+  --card: #F4F2EC;
+  --card-foreground: #191919;
+  --popover: #FAF9F5;
+  --popover-foreground: #191919;
+  --primary: #191919;
+  --primary-foreground: #FAF9F5;
+  --secondary: #EDEBE4;
+  --secondary-foreground: #191919;
+  --muted: #EBE8E0;
+  --muted-foreground: #6B6862;
+  --accent: #EBE8E0;
+  --accent-foreground: #191919;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --border: rgba(25, 25, 25, 0.12);
+  --input: rgba(25, 25, 25, 0.15);
+  --ring: #191919;
+  --radius: 0.875rem;
 }
 
 .dark {
-  --background: oklch(0.1 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.145 0 0);
-  --secondary: oklch(0.205 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.205 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.205 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  /* Anthropic Deep Charcoal Theme (Dark) */
+  --background: #141413;
+  --foreground: #FAF9F5;
+  --card: #1C1C1A;
+  --card-foreground: #FAF9F5;
+  --popover: #141413;
+  --popover-foreground: #FAF9F5;
+  --primary: #FAF9F5;
+  --primary-foreground: #141413;
+  --secondary: #242422;
+  --secondary-foreground: #FAF9F5;
+  --muted: #242422;
+  --muted-foreground: #9E9B93;
+  --accent: #242422;
+  --accent-foreground: #FAF9F5;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.145 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.922 0 0);
-  --sidebar-primary-foreground: oklch(0.145 0 0);
-  --sidebar-accent: oklch(0.205 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --border: rgba(250, 249, 245, 0.12);
+  --input: rgba(250, 249, 245, 0.15);
+  --ring: #FAF9F5;
 }
 
 @layer base {
@@ -122,7 +99,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground selection:bg-foreground selection:text-background;
   }
   html {
     @apply font-sans scroll-smooth;
@@ -130,14 +107,29 @@
 }
 
 @layer utilities {
+  .font-serif {
+    font-family: var(--font-serif), Georgia, serif;
+  }
+  .font-mono {
+    font-family: var(--font-mono), monospace;
+  }
+  .font-sans {
+    font-family: var(--font-sans), sans-serif;
+  }
   .glass {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+    @apply bg-background/80 backdrop-blur-md border border-border;
   }
   .glass-card {
-    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-2xl;
+    @apply bg-card/60 backdrop-blur-md border border-border/80 rounded-2xl;
+  }
+  .anthropic-pill {
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-full text-xs font-mono font-medium uppercase tracking-wider transition-all duration-200 cursor-pointer;
+  }
+  .anthropic-tag {
+    @apply font-mono text-[11px] uppercase tracking-widest text-muted-foreground;
   }
   .gradient-text {
-    @apply bg-gradient-to-r from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent;
   }
   .section-padding {
     @apply py-24 md:py-32;
@@ -162,6 +154,7 @@
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.4s ease;

@@ -5,11 +5,15 @@ import { GitHubIcon, LinkedInIcon } from "@/components/icons";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/30 py-8 px-4 sm:px-6 lg:px-8 bg-card/30 backdrop-blur-sm">
-      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} Sathwik Katkam. All rights reserved.
-        </p>
+    <footer className="border-t border-border py-12 px-4 sm:px-6 lg:px-8 bg-background">
+      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <span className="font-serif font-bold text-foreground tracking-wider">SATHWIK\K</span>
+          <span className="text-border">|</span>
+          <p className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
+            &copy; {new Date().getFullYear()} Sathwik Katkam. All rights reserved.
+          </p>
+        </div>
         <div className="flex items-center gap-4">
           <a
             href="https://github.com/KSathwik"
