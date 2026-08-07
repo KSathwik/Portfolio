@@ -42,9 +42,9 @@ export function About() {
           transition={{ duration: 0.6 }}
           className="mb-16"
         >
-          <div className="anthropic-tag mb-3">01 / ABOUT</div>
+          <div className="anthropic-tag mb-3">ABOUT</div>
           <h2 className="text-4xl sm:text-5xl font-serif tracking-tight mb-4">
-            Background & Focus
+            Background &amp; Focus
           </h2>
         </motion.div>
 

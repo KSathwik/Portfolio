@@ -96,13 +96,19 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--border);
   }
   body {
-    @apply bg-background text-foreground selection:bg-foreground selection:text-background;
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+  body::selection {
+    background-color: var(--foreground);
+    color: var(--background);
   }
   html {
-    @apply font-sans scroll-smooth;
+    font-family: var(--font-sans), sans-serif;
+    scroll-behavior: smooth;
   }
 }
 
@@ -117,22 +123,52 @@
     font-family: var(--font-sans), sans-serif;
   }
   .glass {
-    @apply bg-background/80 backdrop-blur-md border border-border;
+    background-color: var(--background);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
   }
   .glass-card {
-    @apply bg-card/60 backdrop-blur-md border border-border/80 rounded-2xl;
+    background-color: var(--card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
   }
   .anthropic-pill {
-    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-full text-xs font-mono font-medium uppercase tracking-wider transition-all duration-200 cursor-pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1.25rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-family: var(--font-mono), monospace;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.2s ease;
+    cursor: pointer;
   }
   .anthropic-tag {
-    @apply font-mono text-[11px] uppercase tracking-widest text-muted-foreground;
+    font-family: var(--font-mono), monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted-foreground);
   }
   .gradient-text {
-    @apply bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent;
+    background-image: linear-gradient(to right, var(--foreground), var(--foreground));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .section-padding {
-    @apply py-24 md:py-32;
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+  @media (min-width: 768px) {
+    .section-padding {
+      padding-top: 8rem;
+      padding-bottom: 8rem;
+    }
   }
 }
 

@@ -10,11 +10,13 @@ import { Hero } from "@/components/sections/hero";
 import { About } from "@/components/sections/about";
 import { Experience } from "@/components/sections/experience";
 import { Projects } from "@/components/sections/projects";
+import { AISystemsLab } from "@/components/ai/ai-systems-lab";
 import { Skills } from "@/components/sections/skills";
 import { Certifications } from "@/components/sections/certifications";
 import { Education } from "@/components/sections/education";
 import { Contact } from "@/components/sections/contact";
 import { Footer } from "@/components/footer";
+import { PortfolioChatbot } from "@/components/ai/portfolio-chatbot";
 
 export default function Home() {
   return (
@@ -29,9 +31,11 @@ export default function Home() {
         <div className="section-divider" />
         <About />
         <div className="section-divider" />
-        <Experience />
-        <div className="section-divider" />
         <Projects />
+        <div className="section-divider" />
+        <AISystemsLab />
+        <div className="section-divider" />
+        <Experience />
         <div className="section-divider" />
         <Skills />
         <div className="section-divider" />
@@ -43,6 +47,7 @@ export default function Home() {
       </main>
       <Footer />
       <BackToTop />
+      <PortfolioChatbot />
     </>
   );
 }
