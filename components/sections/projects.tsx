@@ -2,7 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
-import { ExternalLink, Layers, CheckCircle2, Cpu } from "lucide-react";
+import { ExternalLink, CheckCircle2, Cpu } from "lucide-react";
 import { GitHubIcon } from "@/components/icons";
 import { PROJECTS_DATA } from "@/data/portfolio-data";
 import { Project } from "@/types/portfolio";

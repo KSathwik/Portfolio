@@ -2,8 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, Send, X, Sparkles, User, RefreshCw, ChevronDown } from "lucide-react";
-import { PERSONAL_INFO, PROJECTS_DATA, EXPERIENCE_DATA, SKILL_CATEGORIES } from "@/data/portfolio-data";
+import { Bot, Send, X, Sparkles, RefreshCw, ChevronDown } from "lucide-react";
 
 interface Message {
   id: string;
@@ -64,10 +63,10 @@ export function PortfolioChatbot() {
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: "1",
+      id: "init-1",
       sender: "ai",
       text: `Hi! I'm Sathwik's AI Assistant. Ask me anything about his GenAI projects, Python backend work, or experience!`,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      timestamp: "12:00 PM",
     },
   ]);
 
@@ -81,11 +80,15 @@ export function PortfolioChatbot() {
     const text = textToSend || input;
     if (!text.trim()) return;
 
+    const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const userMsgId = `usr-${messages.length + 1}`;
+    const aiMsgId = `ai-${messages.length + 2}`;
+
     const userMsg: Message = {
-      id: Date.now().toString(),
+      id: userMsgId,
       sender: "user",
       text,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      timestamp: timeStr,
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -95,7 +98,7 @@ export function PortfolioChatbot() {
     setTimeout(() => {
       const response = generateResponse(text);
       const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
+        id: aiMsgId,
         sender: "ai",
         text: response.text,
         citation: response.citation,

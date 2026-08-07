@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, GitBranch, ArrowRight, Play, CheckCircle2, RefreshCw, Cpu } from "lucide-react";
+import { Bot, GitBranch, ArrowRight, Play, CheckCircle2, RefreshCw } from "lucide-react";
 
 interface AgentNode {
   id: string;

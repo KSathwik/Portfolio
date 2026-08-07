@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowDown, FileDown, Mail, Check, Copy } from "lucide-react";
+import { ArrowDown, FileDown, Check, Copy } from "lucide-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { PERSONAL_INFO } from "@/data/portfolio-data";

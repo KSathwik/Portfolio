@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Database, Search, Cpu, Layers, Sparkles, Sliders } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 
 interface VectorResult {
   text: string;
@@ -38,8 +38,9 @@ export function RAGVisualizer() {
 
     if (q.split(" ").some((w) => w.length > 3 && t.includes(w))) sparseScore += 0.38;
 
-    denseScore = Math.min(0.98, denseScore + Math.random() * 0.05);
-    sparseScore = Math.min(0.95, sparseScore + Math.random() * 0.05);
+    const hashOffset = (text.length % 5) * 0.01;
+    denseScore = Math.min(0.98, denseScore + hashOffset);
+    sparseScore = Math.min(0.95, sparseScore + hashOffset);
     const fusedScore = Number(((denseScore * 0.6 + sparseScore * 0.4)).toFixed(3));
 
     return {
