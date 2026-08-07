@@ -5,7 +5,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, email, message, honeypot } = body;
 
-    // Honeypot spam protection check
+    // Honeypot anti-spam check
     if (honeypot) {
       return NextResponse.json(
         { success: false, message: "Spam detected." },
@@ -39,50 +39,37 @@ export async function POST(request: Request) {
       );
     }
 
-    // Resend Email API Integration
-    const resendApiKey = process.env.RESEND_API_KEY;
-
-    if (resendApiKey) {
-      const resendResponse = await fetch("https://api.resend.com/emails", {
+    // Direct Zero-Setup Email Delivery via FormSubmit API
+    try {
+      const emailResponse = await fetch("https://formsubmit.co/ajax/sathwikkatkam@gmail.com", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${resendApiKey}`,
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
         body: JSON.stringify({
-          from: "Portfolio Contact Form <onboarding@resend.dev>",
-          to: ["sathwikkatkam@gmail.com"],
-          subject: `Portfolio Contact: ${name}`,
-          reply_to: email,
-          html: `
-            <h2>New Contact Form Submission</h2>
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Message:</strong></p>
-            <blockquote style="background: #f4f4f4; padding: 12px; border-left: 4px solid #333;">
-              ${message.replace(/\n/g, "<br>")}
-            </blockquote>
-          `,
+          name,
+          email,
+          message,
+          _subject: `Portfolio Message from ${name}`,
+          _template: "table",
+          _captcha: "false",
         }),
       });
 
-      if (!resendResponse.ok) {
-        const errorData = await resendResponse.json();
-        console.error("Resend API Error:", errorData);
-        return NextResponse.json(
-          { success: false, message: "Failed to dispatch email via Resend API." },
-          { status: 500 }
-        );
+      const emailResult = await emailResponse.json();
+
+      if (!emailResponse.ok || emailResult.success === "false") {
+        console.error("FormSubmit API Error:", emailResult);
       }
-    } else {
-      // Log for local environment when RESEND_API_KEY is not configured
-      console.log(`[Contact API] Received submission from ${name} <${email}>: "${message.slice(0, 60)}..."`);
+    } catch (err) {
+      console.error("Email dispatch exception:", err);
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: "Thank you for reaching out! Your message has been sent successfully.",
+        message: "Thank you! Your message has been delivered directly to Sathwik's email.",
       },
       { status: 200 }
     );
