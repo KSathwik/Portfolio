@@ -1,10 +1,10 @@
-name: Continuous Integration
+name: Continuous Integration & Deployment
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 
 jobs:
   lint-and-build:
@@ -31,3 +31,24 @@ jobs:
 
       - name: Build Application
         run: npm run build
+
+  deploy-production:
+    needs: lint-and-build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Deploy to Vercel Production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID || 'team_v3ARJnzNO4IsFc1MzO5xixch' }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID || 'prj_bDqdyFodsLHH6EMHPd4WD7w6bNnP' }}
+        run: npx vercel deploy --prod --token=$VERCEL_TOKEN
