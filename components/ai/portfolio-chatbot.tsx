@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, Send, X, Sparkles, RefreshCw, ChevronDown } from "lucide-react";
+import { Bot, Send, X, ChevronDown } from "lucide-react";
 
 interface Message {
   id: string;
@@ -71,6 +71,18 @@ export function PortfolioChatbot() {
   ]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  // The launcher waits until the hero heading has scrolled away, so it never sits on the portrait.
+  const [pastHero, setPastHero] = useState(false);
+
+  useEffect(() => {
+    const heading = document.getElementById("about-title");
+    if (!heading) return;
+    const io = new IntersectionObserver(([entry]) => {
+      setPastHero(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+    });
+    io.observe(heading);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -111,89 +123,87 @@ export function PortfolioChatbot() {
 
   return (
     <>
-      {/* Floating Trigger Button */}
+      {/* Launcher: bottom right, shown once the hero is out of view; icon-only on small screens */}
       <AnimatePresence>
-        {!isOpen && (
+        {!isOpen && pastHero && (
           <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
+            type="button"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-full bg-foreground text-background shadow-2xl hover:opacity-90 transition-all font-mono text-xs cursor-pointer group"
-            aria-label="Open AI Assistant Chatbot"
+            className="btn fixed right-4 bottom-4 z-[var(--z-sticky)] shadow-[var(--shadow-lift)] max-sm:w-11 max-sm:px-0 sm:right-6 sm:bottom-6"
+            aria-haspopup="dialog"
           >
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-            </span>
-            <Bot size={16} />
-            <span className="font-semibold">Ask Sathwik&apos;s AI</span>
+            <Bot size={16} aria-hidden="true" />
+            <span className="max-sm:visually-hidden">Ask about Sathwik</span>
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* Floating Chat Modal */}
+      {/* Chat panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.25 }}
-            className={`fixed bottom-6 right-4 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[400px] bg-card border border-border rounded-3xl shadow-2xl overflow-hidden flex flex-col transition-all ${
-              isMinimized ? "h-16" : "h-[520px]"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className={`cut fixed right-4 bottom-6 z-[var(--z-sticky)] flex w-[calc(100vw-32px)] flex-col overflow-hidden bg-paper sm:right-6 sm:w-[400px] ${
+              isMinimized ? "h-auto" : "h-[min(560px,calc(100svh-96px))]"
             }`}
             role="dialog"
             aria-label="AI Portfolio Assistant"
           >
-            {/* Chat Header */}
-            <div className="p-4 bg-secondary/80 border-b border-border flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center">
-                  <Sparkles size={16} />
-                </div>
-                <div>
-                  <h3 className="text-xs font-semibold font-mono uppercase tracking-wider text-foreground flex items-center gap-1.5">
+            {/* Header */}
+            <div className="flex items-center justify-between gap-3 border-b border-rule bg-paper-2 px-4 py-3">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <Bot size={16} aria-hidden="true" className="shrink-0 text-ink-2" />
+                <div className="min-w-0">
+                  <h3 className="text-[length:var(--text-md)] font-display font-medium text-ink">
                     Sathwik AI Assistant
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   </h3>
-                  <p className="text-[10px] text-muted-foreground font-mono">
-                    RAG + LLM Knowledge Agent
-                  </p>
+                  <p className="label text-xs">Answers drawn from this portfolio</p>
                 </div>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <button
+                  type="button"
                   onClick={() => setIsMinimized(!isMinimized)}
-                  className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
+                  className="key key--icon"
                   aria-label="Minimize Chat"
+                  aria-expanded={!isMinimized}
                 >
-                  <ChevronDown size={16} className={`transform transition-transform ${isMinimized ? "rotate-180" : ""}`} />
+                  <ChevronDown
+                    size={16}
+                    aria-hidden="true"
+                    className={`transition-transform duration-[var(--dur-micro)] ${isMinimized ? "rotate-180" : ""}`}
+                  />
                 </button>
                 <button
+                  type="button"
                   onClick={() => setIsOpen(false)}
-                  className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
+                  className="key key--icon"
                   aria-label="Close Chat"
                 >
-                  <X size={16} />
+                  <X size={16} aria-hidden="true" />
                 </button>
               </div>
             </div>
 
             {!isMinimized && (
               <>
-                {/* Messages Body */}
-                <div className="flex-1 p-4 overflow-y-auto space-y-3 font-sans text-xs">
+                {/* Messages */}
+                <div className="flex-1 space-y-4 overflow-y-auto p-4 text-sm" aria-live="polite">
                   {messages.map((msg) => (
                     <div
                       key={msg.id}
                       className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}
                     >
                       <div
-                        className={`max-w-[85%] p-3 rounded-2xl ${
-                          msg.sender === "user"
-                            ? "bg-foreground text-background rounded-br-none"
-                            : "bg-secondary/90 text-foreground border border-border/60 rounded-bl-none leading-relaxed"
+                        className={`max-w-[85%] rounded-[var(--radius-input)] px-3 py-2.5 leading-relaxed text-ink ${
+                          msg.sender === "user" ? "bg-paper-3" : "border border-rule bg-paper-2"
                         }`}
                       >
                         <p dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />
@@ -201,62 +211,62 @@ export function PortfolioChatbot() {
                           <a
                             href={msg.citation}
                             onClick={() => setIsOpen(false)}
-                            className="inline-block mt-2 font-mono text-[10px] text-emerald-500 underline underline-offset-2 hover:opacity-80"
+                            className="link mt-2 inline-block text-xs"
                           >
-                            Jump to section &rarr;
+                            Jump to section
                           </a>
                         )}
                       </div>
-                      <span className="text-[9px] font-mono text-muted-foreground mt-1 px-1">
+                      <span className="mt-1 px-1 font-mono text-[11px] text-ink-3">
                         {msg.timestamp}
                       </span>
                     </div>
                   ))}
 
-                  {isTyping && (
-                    <div className="flex items-center gap-1.5 text-muted-foreground p-2 font-mono text-[10px]">
-                      <RefreshCw size={12} className="animate-spin" />
-                      <span>Searching RAG vector store...</span>
-                    </div>
-                  )}
+                  {isTyping && <p className="label">Writing…</p>}
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Preset Prompt Pills */}
-                <div className="px-3 py-2 border-t border-border/40 bg-secondary/30 flex gap-1.5 overflow-x-auto no-scrollbar">
+                {/* Preset prompts */}
+                <div className="flex flex-wrap gap-2 border-t border-rule bg-paper-2 px-3 py-3">
                   {PRESET_PROMPTS.map((prompt) => (
                     <button
+                      type="button"
                       key={prompt}
                       onClick={() => handleSend(prompt)}
-                      className="px-2.5 py-1 text-[10px] font-mono whitespace-nowrap bg-card border border-border/60 rounded-full text-muted-foreground hover:text-foreground hover:border-border transition-all shrink-0"
+                      className="key key--sm h-auto justify-start py-1.5 text-left whitespace-normal"
                     >
                       {prompt}
                     </button>
                   ))}
                 </div>
 
-                {/* Input Footer */}
+                {/* Input */}
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     handleSend();
                   }}
-                  className="p-3 border-t border-border flex items-center gap-2 bg-card"
+                  className="flex items-center gap-2 border-t border-rule bg-paper p-3"
                 >
+                  <label htmlFor="chatbot-input" className="visually-hidden">
+                    Your question
+                  </label>
                   <input
+                    id="chatbot-input"
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Ask about Sathwik's experience..."
-                    className="flex-1 px-3 py-2 text-xs bg-secondary/50 border border-border/50 rounded-xl outline-none focus:border-foreground/30 text-foreground placeholder:text-muted-foreground/60"
+                    className="input min-h-10 flex-1 py-2 text-sm"
                   />
                   <button
                     type="submit"
                     disabled={!input.trim() || isTyping}
-                    className="p-2 rounded-xl bg-foreground text-background hover:opacity-90 disabled:opacity-40 transition-opacity"
+                    className="key key--primary key--icon shrink-0"
                     aria-label="Send message"
                   >
-                    <Send size={14} />
+                    <Send size={14} aria-hidden="true" />
                   </button>
                 </form>
               </>

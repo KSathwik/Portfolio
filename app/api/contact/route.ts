@@ -39,37 +39,63 @@ export async function POST(request: Request) {
       );
     }
 
-    // Direct Zero-Setup Email Delivery via FormSubmit API
+    // Email delivery via FormSubmit. It rejects requests that don't say which site they came
+    // from, so forward the visitor's page origin (falling back to this request's own origin).
+    const siteOrigin =
+      request.headers.get("origin") ?? new URL(request.url).origin;
+
+    let delivered = false;
+    let reason = "";
     try {
       const emailResponse = await fetch("https://formsubmit.co/ajax/sathwikkatkam@gmail.com", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
+          Accept: "application/json",
+          Origin: siteOrigin,
+          Referer: `${siteOrigin}/`,
         },
         body: JSON.stringify({
           name,
           email,
           message,
+          _replyto: email,
           _subject: `Portfolio Message from ${name}`,
           _template: "table",
           _captcha: "false",
         }),
+        signal: AbortSignal.timeout(15000),
       });
 
-      const emailResult = await emailResponse.json();
-
-      if (!emailResponse.ok || emailResult.success === "false") {
+      const emailResult = await emailResponse.json().catch(() => ({}));
+      delivered = emailResponse.ok && String(emailResult.success) === "true";
+      if (!delivered) {
+        reason = String(emailResult.message ?? `HTTP ${emailResponse.status}`);
         console.error("FormSubmit API Error:", emailResult);
       }
     } catch (err) {
+      reason = "email service unreachable";
       console.error("Email dispatch exception:", err);
+    }
+
+    // Only claim success when the email service actually accepted the message.
+    if (!delivered) {
+      const needsActivation = /activat/i.test(reason);
+      return NextResponse.json(
+        {
+          success: false,
+          message: needsActivation
+            ? "The contact form is being set up and can't deliver messages yet. Please email me directly for now."
+            : "Your message couldn't be sent right now. Please try again, or email me directly.",
+        },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: "Thank you! Your message has been delivered directly to Sathwik's email.",
+        message: "Thanks! Your message is on its way to my inbox.",
       },
       { status: 200 }
     );

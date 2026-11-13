@@ -1,28 +1,55 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, FolderGit2, Briefcase, Award, Code2, ArrowRight } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Search, X, FolderGit2, Briefcase, Award, Code2 } from "lucide-react";
 import { PROJECTS_DATA, EXPERIENCE_DATA, SKILL_CATEGORIES, CERTIFICATIONS_DATA } from "@/data/portfolio-data";
 
+/*
+ * Site search in a native modal <dialog>: showModal() makes the rest of the page inert, so Tab
+ * stays inside; Escape closes it; focus goes to the input on open and back to whatever had it
+ * before on close. Ctrl+K (Cmd+K on a Mac) toggles it from anywhere.
+ */
 export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+
+  const open = useCallback(() => {
+    const dialog = dialogRef.current;
+    if (!dialog || dialog.open) return;
+    returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    dialog.showModal();
+    setIsOpen(true);
+    inputRef.current?.focus();
+  }, []);
+
+  const close = useCallback(() => {
+    dialogRef.current?.close();
+  }, []);
+
+  // Fired by close(), by Escape and by form submission: one place to reset and restore focus.
+  const handleClose = () => {
+    setIsOpen(false);
+    setQuery("");
+    const target = returnFocusRef.current;
+    returnFocusRef.current = null;
+    if (target && target.isConnected) target.focus();
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setIsOpen((prev) => !prev);
-      }
-      if (e.key === "Escape" && isOpen) {
-        setIsOpen(false);
+        if (dialogRef.current?.open) close();
+        else open();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
+  }, [open, close]);
 
   const searchResults = [
     ...PROJECTS_DATA.filter(
@@ -78,104 +105,110 @@ export function CommandPalette() {
     })),
   ];
 
+  // The first eight results, grouped by type in the order they arrive.
+  const visibleResults = searchResults.slice(0, 8);
+  const groups = visibleResults.reduce<{ type: string; items: typeof visibleResults }[]>(
+    (acc, result) => {
+      const group = acc.find((g) => g.type === result.type);
+      if (group) group.items.push(result);
+      else acc.push({ type: result.type, items: [result] });
+      return acc;
+    },
+    []
+  );
+
   const handleSelect = (href: string) => {
-    setIsOpen(false);
-    setQuery("");
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    close();
+    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <>
-      {/* Shortcut Button Hint in Navbar or floating */}
       <button
-        onClick={() => setIsOpen(true)}
-        className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/80 border border-border text-xs text-muted-foreground hover:text-foreground transition-all cursor-pointer"
-        aria-label="Open Command Search"
+        type="button"
+        onClick={open}
+        className="btn btn--icon btn--ghost"
+        aria-label="Search (Ctrl K)"
+        aria-keyshortcuts="Control+K Meta+K"
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
       >
-        <Search size={13} />
-        <span>Search portfolio...</span>
-        <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-muted border border-border">
-          Ctrl+K
-        </kbd>
+        <Search size={16} aria-hidden="true" />
       </button>
 
-      <AnimatePresence>
-        {isOpen && (
-          <div className="fixed inset-0 z-[300] flex items-start justify-center pt-20 px-4 bg-background/80 backdrop-blur-md">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="w-full max-w-2xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
-              role="dialog"
-              aria-modal="true"
-              aria-label="Command Search Palette"
-            >
-              <div className="flex items-center px-4 border-b border-border">
-                <Search size={18} className="text-muted-foreground mr-3" />
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Type to search projects, skills, experience, or certifications..."
-                  className="w-full py-4 text-sm bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground"
-                  autoFocus
-                />
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-1 rounded-md text-muted-foreground hover:text-foreground"
-                  aria-label="Close modal"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              <div className="max-h-[380px] overflow-y-auto p-2">
-                {searchResults.length === 0 ? (
-                  <div className="py-12 text-center text-sm text-muted-foreground">
-                    No results found for &quot;{query}&quot;
-                  </div>
-                ) : (
-                  searchResults.slice(0, 8).map((result) => (
-                    <button
-                      key={result.id}
-                      onClick={() => handleSelect(result.href)}
-                      className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-secondary/70 transition-colors text-left group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-accent/50 border border-border/50 flex items-center justify-center shrink-0">
-                          <result.icon size={15} className="text-muted-foreground group-hover:text-foreground" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-foreground flex items-center gap-2">
-                            {result.title}
-                            <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-secondary text-muted-foreground">
-                              {result.type}
-                            </span>
-                          </div>
-                          <div className="text-xs text-muted-foreground line-clamp-1">
-                            {result.subtitle}
-                          </div>
-                        </div>
-                      </div>
-                      <ArrowRight size={14} className="text-muted-foreground group-hover:text-foreground opacity-0 group-hover:opacity-100 transition-all transform -translate-x-1 group-hover:translate-x-0" />
-                    </button>
-                  ))
-                )}
-              </div>
-
-              <div className="px-4 py-2.5 bg-secondary/30 border-t border-border flex items-center justify-between font-mono text-[11px] text-muted-foreground">
-                <span>Navigate with click or enter</span>
-                <span>ESC to close</span>
-              </div>
-            </motion.div>
+      <dialog
+        ref={dialogRef}
+        className="dialog palette-dialog"
+        aria-label="Search the portfolio"
+        onClose={handleClose}
+        onClick={(e) => {
+          // A click on the backdrop lands on the dialog element itself.
+          if (e.target === dialogRef.current) close();
+        }}
+      >
+        <div className="flex items-center gap-2 border-b border-rule p-3">
+          <div className="relative flex-1">
+            <Search
+              size={16}
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-3"
+            />
+            <input
+              ref={inputRef}
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search projects, skills, experience or certifications"
+              aria-label="Search the portfolio"
+              className="input pl-9 text-sm"
+            />
           </div>
-        )}
-      </AnimatePresence>
+          <button type="button" onClick={close} className="btn btn--icon btn--ghost" aria-label="Close search">
+            <X size={16} aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="max-h-[min(380px,60svh)] overflow-y-auto py-2" aria-live="polite">
+          {searchResults.length === 0 ? (
+            <p className="px-4 py-12 text-center text-sm text-ink-3">
+              No results found for &quot;{query}&quot;
+            </p>
+          ) : (
+            groups.map((group) => (
+              <div key={group.type} className="pb-2">
+                <p className="label px-4 pt-2 pb-1">{group.type}</p>
+                <ul className="rows m-0 list-none p-0">
+                  {group.items.map((result) => (
+                    <li key={result.id}>
+                      <button
+                        type="button"
+                        onClick={() => handleSelect(result.href)}
+                        className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors duration-[var(--dur-micro)] hover:bg-paper-3 focus-visible:bg-paper-3 focus-visible:outline-offset-[-2px]"
+                      >
+                        <result.icon size={16} aria-hidden="true" className="shrink-0 text-ink-3" />
+                        <span className="flex min-w-0 flex-col">
+                          <span className="font-display text-sm font-medium text-ink">{result.title}</span>
+                          <span className="line-clamp-1 text-xs text-ink-3">{result.subtitle}</span>
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="label flex items-center justify-between gap-4 border-t border-rule bg-paper-2 px-4 py-2.5">
+          <span>Choose a result to jump to it</span>
+          <span className="flex items-center gap-1.5">
+            <kbd className="rounded-[4px] border border-rule-2 bg-key-face px-1.5 font-mono text-xs text-ink-2 shadow-key">
+              Esc
+            </kbd>
+            to close
+          </span>
+        </div>
+      </dialog>
     </>
   );
 }

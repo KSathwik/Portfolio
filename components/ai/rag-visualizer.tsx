@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Search, Sparkles } from "lucide-react";
+import { Search } from "lucide-react";
 
 interface VectorResult {
   text: string;
@@ -18,6 +17,14 @@ const SAMPLE_DOCS = [
   "CVE vulnerability remediation on container images and Next.js applications.",
   "Salesforce Chatter API integration fetching support tickets and resolution logs.",
 ];
+
+const SEARCH_MODES = ["hybrid", "dense", "sparse"] as const;
+const MODE_LABELS: Record<(typeof SEARCH_MODES)[number], string> = {
+  hybrid: "Hybrid",
+  dense: "Dense",
+  sparse: "Sparse",
+};
+const CHUNK_SIZES = [128, 256, 512, 1024];
 
 export function RAGVisualizer() {
   const [query, setQuery] = useState("Hybrid RAG search in Python");
@@ -51,126 +58,126 @@ export function RAGVisualizer() {
     };
   }).sort((a, b) => b.fusedScore - a.fusedScore);
 
-  return (
-    <div className="p-6 sm:p-8 rounded-3xl border border-border bg-card/60 backdrop-blur-md my-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <div className="anthropic-tag mb-2 flex items-center gap-1.5 text-foreground">
-            <Sparkles size={14} className="text-emerald-500" />
-            INTERACTIVE AI LAB DEMO
-          </div>
-          <h3 className="text-2xl sm:text-3xl font-serif tracking-tight text-foreground">
-            Hybrid RAG &amp; Vector Search Simulator
-          </h3>
-          <p className="text-xs sm:text-sm text-muted-foreground font-sans mt-1">
-            Simulate Dense FAISS vector retrieval combined with Sparse BM25 Reciprocal Rank Fusion (RRF).
-          </p>
-        </div>
+  const chunkIndex = Math.max(0, CHUNK_SIZES.indexOf(chunkSize));
 
-        {/* Search Mode Pills */}
-        <div className="flex items-center gap-1.5 bg-secondary/80 p-1 rounded-full border border-border/60 self-start md:self-auto">
-          {(["hybrid", "dense", "sparse"] as const).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => setSearchMode(mode)}
-              className={`px-3 py-1 text-[11px] font-mono uppercase tracking-wider rounded-full transition-all ${
-                searchMode === mode
-                  ? "bg-foreground text-background font-semibold"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {mode}
-            </button>
-          ))}
-        </div>
+  return (
+    <div className="grid gap-6">
+      <div className="grid gap-2">
+        <h3>Hybrid RAG &amp; vector search simulator</h3>
+        <p className="max-w-[60ch] text-ink-2">
+          Simulate dense FAISS vector retrieval combined with sparse BM25 through reciprocal rank fusion (RRF).
+        </p>
       </div>
 
-      {/* Interactive Controls */}
-      <div className="grid gap-4 sm:grid-cols-3 mb-8">
-        <div className="sm:col-span-2">
-          <label className="block font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
-            Input Query
-          </label>
-          <div className="flex items-center px-3.5 py-2.5 bg-secondary/50 border border-border/60 rounded-xl">
-            <Search size={16} className="text-muted-foreground mr-2.5 shrink-0" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="w-full text-xs font-mono bg-transparent outline-none text-foreground placeholder:text-muted-foreground"
-              placeholder="Search vector database..."
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center justify-between">
-            <span>Chunk Size: {chunkSize} tokens</span>
-          </label>
-          <div className="flex items-center gap-2 pt-2">
-            {[128, 256, 512, 1024].map((size) => (
+      {/* Controls */}
+      <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
+        <div className="grid gap-2">
+          <span className="label" id="rag-mode-label">Search mode</span>
+          <div
+            role="group"
+            aria-labelledby="rag-mode-label"
+            className="inline-flex items-center gap-1.5 rounded-[var(--radius-input)] bg-paper-3 p-1.5"
+          >
+            {SEARCH_MODES.map((mode) => (
               <button
-                key={size}
-                onClick={() => setChunkSize(size)}
-                className={`flex-1 py-1.5 font-mono text-[10px] rounded-lg border transition-all ${
-                  chunkSize === size
-                    ? "bg-foreground text-background border-foreground"
-                    : "bg-secondary/40 text-muted-foreground border-border hover:border-foreground/40"
-                }`}
+                key={mode}
+                type="button"
+                aria-pressed={searchMode === mode}
+                onClick={() => setSearchMode(mode)}
+                className="key key--sm min-h-10"
               >
-                {size}
+                {MODE_LABELS[mode]}
               </button>
             ))}
           </div>
         </div>
+
+        <div className="grid min-w-[14rem] gap-2">
+          <label htmlFor="rag-chunk-size" className="label flex items-baseline justify-between gap-4">
+            <span>Chunk size</span>
+            <span className="font-mono text-ink">{chunkSize} tokens</span>
+          </label>
+          <input
+            id="rag-chunk-size"
+            type="range"
+            min={0}
+            max={CHUNK_SIZES.length - 1}
+            step={1}
+            value={chunkIndex}
+            aria-valuetext={`${chunkSize} tokens`}
+            onChange={(e) => setChunkSize(CHUNK_SIZES[Number(e.target.value)])}
+            className="h-11 w-full cursor-pointer [accent-color:var(--color-signal)]"
+          />
+        </div>
       </div>
 
-      {/* Vector Results Output List */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-wider text-muted-foreground px-2">
-          <span>Retrieved Context Chunks</span>
-          <span>Similarity Score</span>
+      {/* The mapping: query in, ranked chunks out */}
+      <div className="graphite cut grid overflow-hidden border md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+        <div className="grid content-start gap-4 p-5 sm:p-6">
+          <label htmlFor="rag-query" className="label">
+            Input query
+          </label>
+          <div className="flex items-center gap-2.5 rounded-[var(--radius-input)] border border-graphite-muted/40 bg-graphite-2 px-3 transition-[border-color] duration-[var(--dur-micro)] focus-within:border-signal-2">
+            <Search size={16} aria-hidden="true" className="shrink-0 text-graphite-muted" />
+            <input
+              id="rag-query"
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="code min-h-11 w-full bg-transparent text-graphite-ink placeholder:text-graphite-muted"
+              placeholder="Search vector database..."
+            />
+          </div>
+
+          <dl className="code grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1">
+            <dt className="muted">mode</dt>
+            <dd className="token">{searchMode}</dd>
+            <dt className="muted">chunk_size</dt>
+            <dd className="token">{chunkSize}</dd>
+            <dt className="muted">fused</dt>
+            <dd>0.6 * dense + 0.4 * sparse</dd>
+          </dl>
         </div>
 
-        {results.map((item, idx) => {
-          const score =
-            searchMode === "hybrid"
-              ? item.fusedScore
-              : searchMode === "dense"
-              ? item.denseScore
-              : item.sparseScore;
+        <div className="border-t border-graphite-2 md:border-t-0 md:border-l">
+          <div className="flex items-center justify-between gap-4 border-b border-graphite-2 px-5 py-3 sm:px-6">
+            <span className="label">Retrieved context chunks</span>
+            <span className="label">Similarity score</span>
+          </div>
 
-          return (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: idx * 0.05 }}
-              className="p-4 rounded-xl border border-border/50 bg-secondary/30 hover:border-border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-            >
-              <div className="flex items-start gap-3">
-                <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-muted text-foreground font-semibold mt-0.5">
-                  #0{idx + 1}
-                </span>
-                <p className="text-xs text-foreground font-sans leading-relaxed">
-                  {item.text}
-                </p>
-              </div>
+          <ol>
+            {results.map((item, idx) => {
+              const score =
+                searchMode === "hybrid"
+                  ? item.fusedScore
+                  : searchMode === "dense"
+                  ? item.denseScore
+                  : item.sparseScore;
 
-              <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
-                <div className="w-24 h-2 bg-muted rounded-full overflow-hidden hidden sm:block">
-                  <div
-                    className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                    style={{ width: `${Math.round(score * 100)}%` }}
-                  />
-                </div>
-                <span className="font-mono text-xs text-emerald-500 font-semibold px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20">
-                  {(score * 100).toFixed(1)}%
-                </span>
-              </div>
-            </motion.div>
-          );
-        })}
+              return (
+                <li
+                  key={idx}
+                  className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 border-b border-graphite-2 px-5 py-3 last:border-b-0 sm:px-6"
+                >
+                  <span className="code muted">#0{idx + 1}</span>
+                  <p className="text-sm leading-relaxed">{item.text}</p>
+                  <div className="grid justify-items-end gap-1.5 pt-0.5">
+                    <span className="code token">{(score * 100).toFixed(1)}%</span>
+                    <span
+                      aria-hidden="true"
+                      className="hidden h-1 w-20 overflow-hidden rounded-[2px] bg-graphite-2 sm:block"
+                    >
+                      <span
+                        className="block h-full w-full origin-left bg-signal-2 transition-transform duration-[var(--dur-short)]"
+                        style={{ transform: `scaleX(${score})` }}
+                      />
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
       </div>
     </div>
   );
