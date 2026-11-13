@@ -46,9 +46,22 @@ jobs:
         with:
           node-version: 20
 
+      - name: Check for Vercel token
+        id: vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -n "$VERCEL_TOKEN" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Vercel deploy skipped::Add a VERCEL_TOKEN repository secret (Settings > Secrets and variables > Actions) to deploy to production."
+          fi
+
       - name: Deploy to Vercel Production
+        if: steps.vercel.outputs.configured == 'true'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID || 'team_v3ARJnzNO4IsFc1MzO5xixch' }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID || 'prj_bDqdyFodsLHH6EMHPd4WD7w6bNnP' }}
-        run: npx vercel deploy --prod --token=$VERCEL_TOKEN
+        run: npx vercel@latest deploy --prod --yes --token="$VERCEL_TOKEN"
