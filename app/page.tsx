@@ -1,13 +1,8 @@
 "use client";
 
 import { Navigation } from "@/components/navigation";
-import { ScrollProgress } from "@/components/scroll-progress";
-import { LoadingScreen } from "@/components/loading-screen";
-import { Background } from "@/components/background";
-import { CursorGlow } from "@/components/cursor-glow";
 import { BackToTop } from "@/components/back-to-top";
 import { Hero } from "@/components/sections/hero";
-import { About } from "@/components/sections/about";
 import { Experience } from "@/components/sections/experience";
 import { Projects } from "@/components/sections/projects";
 import { AISystemsLab } from "@/components/ai/ai-systems-lab";
@@ -21,28 +16,27 @@ import { PortfolioChatbot } from "@/components/ai/portfolio-chatbot";
 export default function Home() {
   return (
     <>
-      <LoadingScreen />
-      <Background />
-      <CursorGlow />
-      <ScrollProgress />
       <Navigation />
       <main>
+        {/* About me comes first: who I am, then what I've built. */}
         <Hero />
-        <div className="section-divider" />
-        <About />
-        <div className="section-divider" />
         <Projects />
-        <div className="section-divider" />
-        <AISystemsLab />
-        <div className="section-divider" />
         <Experience />
-        <div className="section-divider" />
         <Skills />
-        <div className="section-divider" />
-        <Certifications />
-        <div className="section-divider" />
-        <Education />
-        <div className="section-divider" />
+        <AISystemsLab />
+        {/* Education and certifications share one band, side by side. */}
+        <section aria-labelledby="education-title" className="section section--tint">
+          <div className="wrap">
+            <div className="section-head">
+              <span className="section-mark">06 Education</span>
+              <h2 id="education-title" className="kicker-title">Education and certifications</h2>
+            </div>
+            <div className="grid gap-x-[var(--gap-columns)] gap-y-16 lg:grid-cols-2">
+              <Education />
+              <Certifications />
+            </div>
+          </div>
+        </section>
         <Contact />
       </main>
       <Footer />

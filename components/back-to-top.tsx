@@ -11,7 +11,8 @@ export function BackToTop() {
     const handleScroll = () => {
       setIsVisible(window.scrollY > 400);
     };
-    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -23,15 +24,16 @@ export function BackToTop() {
     <AnimatePresence>
       {isVisible && (
         <motion.button
-          initial={{ opacity: 0, y: 20, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.8 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
+          type="button"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 12 }}
+          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 w-10 h-10 rounded-xl bg-card/80 backdrop-blur-xl border border-border/50 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-border hover:bg-card transition-all shadow-lg shadow-background/20 cursor-pointer"
+          className="btn btn--icon fixed bottom-4 left-4 z-[var(--z-sticky)] sm:bottom-6 sm:left-6"
           aria-label="Back to top"
         >
-          <ArrowUp size={16} />
+          <ArrowUp size={16} aria-hidden="true" />
         </motion.button>
       )}
     </AnimatePresence>

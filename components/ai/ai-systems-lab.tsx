@@ -1,53 +1,25 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
-
 import { RAGVisualizer } from "@/components/ai/rag-visualizer";
 import { AgentOrchestrator } from "@/components/ai/agent-orchestrator";
 
 export function AISystemsLab() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
   return (
-    <section id="ai-lab" className="section-padding px-4 sm:px-6 lg:px-8 relative" aria-label="AI Systems Lab Section">
-      <div className="max-w-6xl mx-auto" ref={ref}>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
-          className="mb-12"
-        >
-          <div className="anthropic-tag mb-3 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            AI SYSTEMS LAB
-          </div>
-          <h2 className="text-4xl sm:text-5xl font-serif tracking-tight mb-4">
-            Interactive AI Demonstrations
-          </h2>
-          <p className="text-muted-foreground max-w-2xl text-base font-sans leading-relaxed">
-            Test live simulated environments for Hybrid RAG vector retrieval, reciprocal rank fusion, and autonomous multi-agent ReAct orchestration.
+    <section id="ai-lab" aria-labelledby="ai-lab-title" className="section">
+      <div className="wrap">
+        <div className="section-head">
+          <span className="section-mark">05 Lab</span>
+          <h2 id="ai-lab-title" className="kicker-title">Try how my systems think</h2>
+          <p>
+            Two small demos. Watch hybrid search rank documents, then watch planner, executor and
+            critic agents hand work to each other.
           </p>
-        </motion.div>
+        </div>
 
-        {/* RAG Visualizer Demo */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
+        <div className="grid gap-[var(--space-3xl)]">
           <RAGVisualizer />
-        </motion.div>
-
-        {/* Agent Orchestrator Demo */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
           <AgentOrchestrator />
-        </motion.div>
+        </div>
       </div>
     </section>
   );

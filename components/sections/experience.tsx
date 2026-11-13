@@ -1,124 +1,129 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
-import { Briefcase, Calendar, MapPin, CheckCircle2 } from "lucide-react";
-import { TextReveal } from "@/components/text-reveal";
-import { EXPERIENCE_DATA } from "@/data/portfolio-data";
+import { Fragment } from "react";
+import { EXPERIENCE_DATA, PROJECTS_DATA } from "@/data/portfolio-data";
+
+/* Figures inside a metric sentence (45%, 10,000+, <120ms) are machine values: set them in mono, keep the sentence exactly. */
+const FIGURE = /(<?\d[\d,.]*(?:\+|%|ms|x)?)/g;
+function MetricLine({ text }: { text: string }) {
+  const parts = text.split(FIGURE);
+  return (
+    <>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <span key={i} className="font-mono font-medium text-signal">
+            {part}
+          </span>
+        ) : (
+          <Fragment key={i}>{part}</Fragment>
+        )
+      )}
+    </>
+  );
+}
+
+/* "SmartFit Enterprise Platform" and "SmartFit – Enterprise Platform" name the same work. */
+function normalizeName(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/(enterprise|platform)/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+const PROJECT_NAMES = new Set(PROJECTS_DATA.map((p) => normalizeName(p.title)));
 
 export function Experience() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
   return (
-    <section id="experience" className="section-padding px-4 sm:px-6 lg:px-8" aria-label="Work Experience Section">
-      <div className="max-w-6xl mx-auto" ref={ref}>
-        <div className="mb-16">
-          <div className="anthropic-tag mb-3">EXPERIENCE</div>
-          <TextReveal as="h2" className="text-4xl sm:text-5xl font-serif tracking-tight mb-4">
-            Professional Work
-          </TextReveal>
+    <section id="experience" aria-labelledby="experience-title" className="section">
+      <div className="wrap">
+        <div className="section-head">
+          <span className="section-mark">03 Experience</span>
+          <h2 id="experience-title" className="kicker-title">Where I&apos;ve worked</h2>
         </div>
 
-        <div className="space-y-12">
-          {EXPERIENCE_DATA.map((exp, expIndex) => (
-            <motion.div
+        <ol className="border-b border-rule">
+          {EXPERIENCE_DATA.map((exp) => (
+            <li
               key={exp.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: expIndex * 0.15 }}
+              className="grid gap-x-[var(--gap-columns)] gap-y-6 border-t border-rule py-10 lg:grid-cols-12"
             >
-              {/* Company Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-accent/50 border border-border/50 flex items-center justify-center shrink-0">
-                    <Briefcase size={18} className="text-muted-foreground" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground">{exp.company}</h3>
-                    <p className="text-sm text-muted-foreground">{exp.role}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 sm:ml-auto text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Calendar size={12} />
-                    {exp.duration}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <MapPin size={12} />
-                    {exp.location}
-                  </span>
-                  {exp.current && (
-                    <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-[10px] font-medium">
-                      Current
-                    </span>
-                  )}
+              {/* The ruler: company, role, dates, place */}
+              <div className="lg:col-span-4">
+                <div className="relative grid gap-1 border-l border-rule-2 pl-4 lg:sticky lg:top-24">
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-2.5 -left-px h-px w-3 bg-ink-3"
+                  />
+                  <p className="font-display text-[length:var(--text-lg)] font-medium tracking-[var(--tracking-display)] text-ink">
+                    {exp.company}
+                  </p>
+                  <p className="text-ink-2">{exp.role}</p>
+                  <p className="label">{exp.duration}</p>
+                  <p className="label">{exp.location}</p>
+                  {exp.current && <p className="w-fit rounded-full bg-signal-wash px-2.5 py-1 text-xs font-medium text-signal-deep">Current role</p>}
                 </div>
               </div>
 
-              {/* Experience Projects Grid */}
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 ml-0 sm:ml-[52px]">
-                {exp.projects.map((project, projIndex) => (
-                  <motion.div
-                    key={project.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{
-                      duration: 0.4,
-                      delay: 0.2 + expIndex * 0.1 + projIndex * 0.08,
-                    }}
-                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                    className="card-glow p-5 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm hover:border-border hover:bg-card/80 transition-all group flex flex-col justify-between"
-                  >
-                    <div>
-                      <h4 className="text-sm font-semibold mb-2 text-foreground group-hover:text-foreground">
-                        {project.name}
-                      </h4>
-                      <p className="text-xs text-muted-foreground mb-4 leading-relaxed line-clamp-3">
-                        {project.description}
-                      </p>
+              {/* The work */}
+              <ul className="rows lg:col-span-8">
+                {exp.projects.map((project) => {
+                  const hasProject = PROJECT_NAMES.has(normalizeName(project.name));
 
-                      <div className="flex flex-wrap gap-1.5 mb-4">
-                        {project.technologies.slice(0, 5).map((tech) => (
-                          <span
-                            key={tech}
-                            className="px-2 py-0.5 text-[10px] font-mono font-medium text-muted-foreground bg-accent/50 border border-border/30 rounded-md"
-                          >
+                  return (
+                    <li key={project.name} className="grid gap-4 py-6 first:pt-0">
+                      <div className="grid gap-2">
+                        <h3>{project.name}</h3>
+                        <p className="text-ink-2">{project.description}</p>
+                      </div>
+
+                      {project.metrics && (
+                        <ul className="rows border-y border-rule">
+                          {project.metrics.map((metric, i) => (
+                            <li key={i} className="py-2 text-sm text-ink-2">
+                              <MetricLine text={metric} />
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      <div className="flex flex-wrap gap-1.5">
+                        {project.technologies.map((tech) => (
+                          <span key={tech} className="tag">
                             {tech}
                           </span>
                         ))}
                       </div>
 
-                      <ul className="space-y-1.5 mb-4">
-                        {project.responsibilities.map((resp, i) => (
-                          <li
-                            key={i}
-                            className="text-[11px] text-muted-foreground flex items-start gap-2"
+                      <div className="flex flex-wrap items-start gap-x-6 gap-y-2">
+                        {project.responsibilities.length > 0 && (
+                          <details className="group min-w-0 flex-1 basis-64">
+                            <summary className="flex min-h-10 w-fit cursor-pointer items-center text-sm font-medium text-ink-2 transition-colors duration-[var(--dur-micro)] hover:text-ink">
+                              Responsibilities ({project.responsibilities.length})
+                            </summary>
+                            <ul className="mt-1 grid list-disc gap-1 pl-5 text-sm text-ink-2 marker:text-ink-3">
+                              {project.responsibilities.map((resp, i) => (
+                                <li key={i}>{resp}</li>
+                              ))}
+                            </ul>
+                          </details>
+                        )}
+                        {hasProject && (
+                          <a
+                            href="#projects"
+                            className="link inline-flex min-h-10 items-center text-sm"
                           >
-                            <span className="w-1 h-1 rounded-full bg-muted-foreground/50 mt-1.5 shrink-0" />
-                            <span>{resp}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Quantified Metrics Highlight */}
-                    {project.metrics && (
-                      <div className="pt-3 border-t border-border/40 space-y-1">
-                        {project.metrics.map((metric, i) => (
-                          <div key={i} className="text-[10px] font-mono text-emerald-500 dark:text-emerald-400 flex items-center gap-1.5">
-                            <CheckCircle2 size={11} className="shrink-0" />
-                            <span>{metric}</span>
-                          </div>
-                        ))}
+                            See the project
+                            <span className="visually-hidden">: {project.name}</span>
+                          </a>
+                        )}
                       </div>
-                    )}
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

@@ -1,252 +1,273 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
-import { ExternalLink, CheckCircle2, Cpu } from "lucide-react";
+import { useState, useEffect, useRef, useId, Fragment } from "react";
+import { X, ArrowUpRight } from "lucide-react";
+import { RetrievalField } from "@/components/retrieval-field";
 import { GitHubIcon } from "@/components/icons";
 import { PROJECTS_DATA } from "@/data/portfolio-data";
 import { Project } from "@/types/portfolio";
 
-const categories = ["All", "AI/ML", "Enterprise"];
+const FEATURED_ID = "ai-knowledge-assistant";
+
+/* Figures inside a metric sentence (250ms, 94.2%, 50,000+, <0.1%, 3x) are machine values: set them in mono, keep the sentence exactly. */
+const FIGURE = /(<?\d[\d,.]*(?:\+|%|ms|x)?)/g;
+function MetricLine({ text }: { text: string }) {
+  const parts = text.split(FIGURE);
+  return (
+    <>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <span key={i} className="font-mono font-medium text-signal">
+            {part}
+          </span>
+        ) : (
+          <Fragment key={i}>{part}</Fragment>
+        )
+      )}
+    </>
+  );
+}
 
 export function Projects() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const [activeCategory, setActiveCategory] = useState("All");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const titleId = useId();
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && selectedProject) {
-        setSelectedProject(null);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedProject]);
+  const featured = PROJECTS_DATA.find((p) => p.id === FEATURED_ID);
+  const others = PROJECTS_DATA.filter((p) => p.id !== FEATURED_ID);
 
+  const openProject = (project: Project) => {
+    triggerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    setSelectedProject(project);
+  };
+
+  const closeDialog = () => dialogRef.current?.close();
+
+  /* Open the native modal once its content is rendered; Escape and close() both fire onClose. */
   useEffect(() => {
-    if (selectedProject) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
+    const dialog = dialogRef.current;
+    if (selectedProject && dialog && !dialog.open) {
+      dialog.showModal();
+      /* React's autoFocus runs before showModal(), so move focus explicitly once the modal is open. */
+      closeButtonRef.current?.focus();
     }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
   }, [selectedProject]);
 
-  const filteredProjects =
-    activeCategory === "All"
-      ? PROJECTS_DATA
-      : PROJECTS_DATA.filter((p) => p.category === activeCategory);
+  const handleClose = () => {
+    setSelectedProject(null);
+    const trigger = triggerRef.current;
+    triggerRef.current = null;
+    trigger?.focus();
+  };
 
   return (
-    <section id="projects" className="section-padding px-4 sm:px-6 lg:px-8 relative" aria-label="Projects Section">
-      <div className="max-w-6xl mx-auto" ref={ref}>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
-          className="mb-12"
-        >
-          <div className="anthropic-tag mb-3">PROJECTS</div>
-          <h2 className="text-4xl sm:text-5xl font-serif tracking-tight mb-4">
-            Production &amp; GenAI Projects
-          </h2>
-          <p className="text-muted-foreground max-w-2xl text-base font-sans mb-8 leading-relaxed">
-            Explorations and production implementations across Generative AI, Hybrid RAG, Multi-Agent ReAct workflows, and enterprise platform security.
+    <section id="projects" aria-labelledby="projects-title" className="section section--tint">
+      <div className="wrap">
+        <div className="section-head">
+          <span className="section-mark">02 Projects</span>
+          <h2 id="projects-title" className="kicker-title">Things I&apos;ve built</h2>
+          <p>
+            Production work and personal projects across retrieval, agents and enterprise
+            platforms. Open any project for its architecture and results.
           </p>
+        </div>
 
-          <div className="flex items-center gap-2 flex-wrap" role="tablist" aria-label="Filter projects by category">
-            {categories.map((category) => (
-              <button
-                key={category}
-                role="tab"
-                aria-selected={activeCategory === category}
-                onClick={() => setActiveCategory(category)}
-                className={`anthropic-pill ${
-                  activeCategory === category
-                    ? "bg-foreground text-background"
-                    : "bg-secondary/60 text-muted-foreground hover:text-foreground border border-border"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </motion.div>
-
-        <div className="grid gap-6 md:grid-cols-2">
-          {filteredProjects.map((project, index) => (
-            <motion.article
-              key={project.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              tabIndex={0}
-              role="button"
-              aria-label={`View details for ${project.title}`}
-              onClick={() => setSelectedProject(project)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  setSelectedProject(project);
-                }
-              }}
-              className="group relative p-6 sm:p-8 rounded-2xl border border-border bg-card/70 backdrop-blur-md hover:bg-card hover:border-foreground/30 transition-all cursor-pointer shadow-sm flex flex-col justify-between focus:outline-none focus:ring-2 focus:ring-foreground/50"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="anthropic-tag">{project.category}</span>
-                  <span className="p-2 rounded-full bg-secondary border border-border text-muted-foreground group-hover:text-foreground transition-colors">
-                    <ExternalLink size={14} />
-                  </span>
-                </div>
-
-                <h3 className="text-2xl font-serif tracking-tight mb-3 text-foreground group-hover:text-foreground/90 transition-colors">
-                  {project.title}
-                </h3>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-6 line-clamp-3 leading-relaxed font-sans">
-                  {project.description}
-                </p>
-
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {project.highlights.map((highlight) => (
-                    <span
-                      key={highlight}
-                      className="px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-foreground/80 bg-secondary border border-border rounded-full"
-                    >
-                      {highlight}
-                    </span>
-                  ))}
-                </div>
+        {featured && (
+          <article className="card featured reveal mb-6">
+            <div className="featured-visual">
+              <RetrievalField className="h-[260px] sm:h-[340px] lg:h-full lg:min-h-[440px]" />
+            </div>
+            <div className="flex flex-col gap-6 p-6 sm:p-10">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="tag">{featured.category}</span>
               </div>
+              <div className="grid gap-3">
+                <h3 className="text-[length:var(--text-3xl)] leading-[1.05] font-medium">{featured.title}</h3>
+                <p className="text-ink-2">{featured.description}</p>
+              </div>
+              {featured.metrics && (
+                <ul className="grid gap-2 border-y border-rule py-4 text-sm text-ink-2">
+                  {featured.metrics.map((m) => (
+                    <li key={m}>
+                      <MetricLine text={m} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="flex flex-wrap gap-1.5">
+                {featured.technologies.slice(0, 4).map((tech) => (
+                  <span key={tech} className="tag">
+                    {tech}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-auto flex flex-wrap items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => openProject(featured)}
+                  aria-label={`Read the case study for ${featured.title}`}
+                >
+                  Read the case study
+                  <ArrowUpRight size={16} aria-hidden="true" />
+                </button>
+                <a href={featured.repoUrl} target="_blank" rel="noopener noreferrer" className="btn btn--ghost">
+                  <GitHubIcon className="h-4 w-4" />
+                  Source
+                  <span className="visually-hidden"> (opens in a new tab)</span>
+                </a>
+              </div>
+            </div>
+          </article>
+        )}
 
-              <div className="flex flex-wrap items-center justify-between pt-4 border-t border-border/50 gap-2">
-                <div className="flex flex-wrap gap-2">
-                  {project.technologies.slice(0, 5).map((tech) => (
-                    <span
-                      key={tech}
-                      className="font-mono text-[11px] text-muted-foreground"
-                    >
+        <ul className="m-0 grid list-none gap-6 p-0 md:grid-cols-2 lg:grid-cols-3">
+          {others.map((project) => (
+            <li key={project.id} className="reveal">
+              <article className="card card--lift relative flex h-full flex-col gap-5 p-6 sm:p-7">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="tag">{project.category}</span>
+                  <a
+                    href={project.repoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn--icon btn--ghost relative z-[1] -mr-2 -mt-2"
+                    aria-label={`${project.title} source on GitHub (opens in a new tab)`}
+                  >
+                    <GitHubIcon className="h-4 w-4" />
+                  </a>
+                </div>
+                <div className="grid gap-2">
+                  <h3 className="text-[length:var(--text-title)] leading-[1.15] font-medium">{project.title}</h3>
+                  <p className="text-sm text-ink-2">{project.description}</p>
+                </div>
+                {project.metrics?.[0] && (
+                  <p className="border-l-2 border-clay pl-3 text-sm text-ink-2">
+                    <MetricLine text={project.metrics[0]} />
+                  </p>
+                )}
+                <div className="mt-auto flex flex-wrap gap-1.5">
+                  {project.technologies.slice(0, 4).map((tech) => (
+                    <span key={tech} className="tag">
                       {tech}
                     </span>
                   ))}
                 </div>
-                <span className="anthropic-tag text-[10px] underline underline-offset-4 group-hover:text-foreground">
-                  Architecture &amp; Metrics &rarr;
-                </span>
-              </div>
-            </motion.article>
+                {/* The pseudo-element stretches over the card, so the whole card opens the details. */}
+                <button
+                  type="button"
+                  className="link inline-flex w-fit cursor-pointer items-center gap-1 text-sm font-medium after:absolute after:inset-0 after:rounded-[var(--radius-card)] after:content-[''] focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-solid focus-visible:after:outline-[color:var(--color-focus)]"
+                  onClick={() => openProject(project)}
+                  aria-label={`View details for ${project.title}`}
+                >
+                  View details
+                  <ArrowUpRight size={14} aria-hidden="true" />
+                </button>
+              </article>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
-      {/* Accessible Interactive Detail Modal */}
-      {selectedProject && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md overflow-y-auto"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="modal-title"
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="relative w-full max-w-2xl p-6 sm:p-8 rounded-3xl border border-border bg-card shadow-2xl overflow-hidden my-8"
-          >
+      {/* Project detail modal: native dialog gives focus trapping, Escape and the backdrop. */}
+      <dialog
+        ref={dialogRef}
+        aria-labelledby={titleId}
+        onClose={handleClose}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) closeDialog();
+        }}
+        className="dialog w-[min(42rem,calc(100vw-32px))] max-w-none max-h-[calc(100svh-32px)] overflow-y-auto p-0"
+      >
+        {selectedProject && (
+          <div className="relative p-6 sm:p-10">
             <button
-              onClick={() => setSelectedProject(null)}
-              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Close modal"
+              ref={closeButtonRef}
+              type="button"
+              onClick={closeDialog}
+              autoFocus
+              className="btn btn--icon absolute top-5 right-5"
+              aria-label="Close project details"
             >
-              &times;
+              <X size={16} aria-hidden="true" />
             </button>
 
-            <div className="anthropic-tag mb-2">{selectedProject.category}</div>
-            <h3 id="modal-title" className="text-2xl sm:text-3xl font-serif tracking-tight mb-4 text-foreground">
+            <p className="label mb-2">{selectedProject.category}</p>
+            <h2 id={titleId} className="mb-4 pr-12 text-[length:var(--text-2xl)] font-medium">
               {selectedProject.title}
-            </h3>
+            </h2>
 
-            <p className="text-sm text-muted-foreground mb-6 leading-relaxed font-sans">
-              {selectedProject.longDescription}
-            </p>
+            <p className="mb-8 text-ink-2">{selectedProject.longDescription}</p>
 
-            {/* Metrics */}
+            <div className="mb-8">
+              <p className="label mb-2">Highlights</p>
+              <ul className="rows border-y border-rule">
+                {selectedProject.highlights.map((highlight) => (
+                  <li key={highlight} className="py-2 text-sm text-ink">
+                    {highlight}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
             {selectedProject.metrics && (
-              <div className="mb-6 p-4 rounded-xl bg-secondary/40 border border-border/50">
-                <div className="anthropic-tag mb-2 flex items-center gap-1.5 text-foreground">
-                  <CheckCircle2 size={14} className="text-emerald-500" />
-                  Key Impact Metrics
-                </div>
-                <ul className="space-y-1.5">
+              <div className="mb-8">
+                <p className="label mb-2">Key impact metrics</p>
+                <ul className="rows border-y border-rule">
                   {selectedProject.metrics.map((m, i) => (
-                    <li key={i} className="text-xs text-muted-foreground flex items-start gap-2 font-mono">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
-                      {m}
+                    <li key={i} className="py-2 text-sm text-ink-2">
+                      <MetricLine text={m} />
                     </li>
                   ))}
                 </ul>
               </div>
             )}
 
-            {/* Architecture Steps */}
             {selectedProject.architecture && (
-              <div className="mb-6 p-4 rounded-xl bg-secondary/40 border border-border/50">
-                <div className="anthropic-tag mb-2 flex items-center gap-1.5 text-foreground">
-                  <Cpu size={14} className="text-indigo-400" />
-                  System Architecture Pipeline
-                </div>
-                <ul className="space-y-2">
+              <div className="mb-8">
+                <p className="label mb-2">System architecture pipeline</p>
+                <ol className="graphite cut cut--sm code grid gap-2 border p-4">
                   {selectedProject.architecture.map((step, i) => (
-                    <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
-                      <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-muted text-foreground shrink-0">
-                        0{i + 1}
-                      </span>
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="token shrink-0">0{i + 1}</span>
                       <span>{step}</span>
                     </li>
                   ))}
-                </ul>
+                </ol>
               </div>
             )}
 
-            <div className="mb-6">
-              <div className="anthropic-tag mb-2">Tech Stack</div>
-              <div className="flex flex-wrap gap-2">
+            <div className="mb-8">
+              <p className="label mb-2">Tech stack</p>
+              <div className="flex flex-wrap gap-1.5">
                 {selectedProject.technologies.map((tech) => (
-                  <span
-                    key={tech}
-                    className="px-2.5 py-1 font-mono text-[11px] text-muted-foreground bg-muted/50 rounded-md border border-border/50"
-                  >
+                  <span key={tech} className="tag">
                     {tech}
                   </span>
                 ))}
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border/50">
+            <div className="flex flex-wrap items-center gap-3 border-t border-rule pt-6">
               <a
                 href={selectedProject.repoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="anthropic-pill bg-foreground text-background hover:opacity-90 flex items-center gap-2"
+                className="btn"
               >
-                <GitHubIcon className="w-3.5 h-3.5" />
-                <span>Inspect Repository</span>
+                <GitHubIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>Inspect repository</span>
+                <span className="visually-hidden"> (opens in a new tab)</span>
               </a>
-              <button
-                onClick={() => setSelectedProject(null)}
-                className="anthropic-pill bg-secondary text-foreground border border-border hover:bg-muted"
-              >
-                Close Preview
+              <button type="button" onClick={closeDialog} className="btn btn--ghost">
+                Close
               </button>
             </div>
-          </motion.div>
-        </div>
-      )}
+          </div>
+        )}
+      </dialog>
     </section>
   );
 }

@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Moon, Sun, FileDown } from "lucide-react";
+import { Menu, X, Moon, Sun } from "lucide-react";
+import { ResumeDownload, ResumeView } from "@/components/resume-viewer";
 import { useTheme } from "next-themes";
 import { CommandPalette } from "@/components/command-palette";
 import { PERSONAL_INFO } from "@/data/portfolio-data";
@@ -19,102 +20,91 @@ function useIsClient() {
 const navItems = [
   { label: "About", href: "#about" },
   { label: "Projects", href: "#projects" },
-  { label: "AI Lab", href: "#ai-lab" },
   { label: "Experience", href: "#experience" },
-  { label: "Skills", href: "#skills" },
-  { label: "Education", href: "#education" },
+  { label: "Lab", href: "#ai-lab" },
   { label: "Contact", href: "#contact" },
 ];
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const mounted = useIsClient();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const isDark = resolvedTheme === "dark";
+  const themeLabel = isDark ? "Switch to light theme" : "Switch to dark theme";
+  const toggleTheme = () => setTheme(isDark ? "light" : "dark");
+
   return (
-    <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-background/80 backdrop-blur-xl border-b border-border/40 shadow-sm"
-          : "bg-transparent"
+    <header
+      className={`sticky top-0 z-[var(--z-sticky-nav)] border-b transition-[border-color,background-color] duration-[var(--dur-short)] ${
+        isScrolled ? "border-rule bg-paper/90 backdrop-blur-md" : "border-transparent bg-transparent"
       }`}
     >
-      <nav
-        aria-label="Main Navigation"
-        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between"
-      >
+      <nav aria-label="Main Navigation" className="wrap flex h-16 items-center justify-between gap-6">
         <a
-          href="#"
-          className="text-lg font-serif font-bold tracking-wider text-foreground hover:opacity-80 transition-opacity"
-          aria-label="Sathwik Katkam Portfolio Home"
+          href="#about"
+          className="group flex items-center gap-2.5 text-ink no-underline"
+          aria-label="Sathwik Katkam, back to top"
         >
-          SK
+          <span
+            aria-hidden="true"
+            className="grid h-9 w-9 place-items-center rounded-full border border-rule-2 bg-transparent font-display text-[15px] font-medium text-ink transition-colors duration-[var(--dur-short)] group-hover:border-ink-3"
+          >
+            sk
+          </span>
+          <span className="whitespace-nowrap font-display text-lg font-medium tracking-[var(--tracking-display)] max-[22.5rem]:hidden">
+            {PERSONAL_INFO.name}
+          </span>
         </a>
 
         {/* Desktop Nav Items */}
-        <div className="hidden md:flex items-center gap-1.5">
+        <div className="hidden items-center gap-1 lg:flex">
           {navItems.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className="px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-secondary"
+              className="whitespace-nowrap rounded-full px-3 py-2.5 text-sm font-medium text-ink-2 no-underline transition-colors duration-[var(--dur-micro)] hover:bg-paper-3 hover:text-ink"
             >
               {item.label}
             </a>
           ))}
-
-          <div className="ml-2 pl-2 border-l border-border flex items-center gap-2">
-            <CommandPalette />
-            
-            {mounted && (
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-                aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-              >
-                {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-              </button>
-            )}
-
-            <a
-              href={PERSONAL_INFO.resumeUrl}
-              download
-              className="anthropic-pill bg-foreground text-background text-[10px] px-3.5 py-1.5 hover:opacity-90 flex items-center gap-1.5"
-            >
-              <FileDown size={13} />
-              <span>Resume</span>
-            </a>
-          </div>
         </div>
 
-        {/* Mobile Navigation Buttons */}
-        <div className="flex md:hidden items-center gap-2">
+        {/* One set of controls at every width: search (and its Ctrl+K shortcut), theme, then résumé on desktop or the menu below it. */}
+        <div className="flex items-center gap-2">
+          <CommandPalette />
+
           {mounted && (
             <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 rounded-lg hover:bg-accent text-muted-foreground"
-              aria-label="Toggle theme"
+              type="button"
+              onClick={toggleTheme}
+              className="key key--icon"
+              aria-label={themeLabel}
             >
-              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              {isDark ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
             </button>
           )}
+
+          <span className="hidden lg:contents">
+            <ResumeView className="btn btn--sm" label="Resume" />
+          </span>
+
           <button
+            type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 rounded-lg hover:bg-accent text-muted-foreground"
+            className="key key--icon lg:hidden"
             aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={isMobileMenuOpen}
           >
-            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {isMobileMenuOpen ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}
           </button>
         </div>
       </nav>
@@ -123,37 +113,30 @@ export function Navigation() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25 }}
-            className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border/50"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute inset-x-0 top-full border-b border-rule bg-paper lg:hidden"
           >
-            <div className="px-4 py-4 space-y-2">
+            <div className="wrap rows py-2">
               {navItems.map((item) => (
                 <a
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
+                  className="block py-3 font-display text-lg text-ink no-underline"
                 >
                   {item.label}
                 </a>
               ))}
-              <div className="pt-3 border-t border-border flex items-center justify-between">
-                <a
-                  href={PERSONAL_INFO.resumeUrl}
-                  download
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full text-center anthropic-pill bg-foreground text-background text-xs py-2.5"
-                >
-                  Download Resume
-                </a>
+              <div className="py-4">
+                <ResumeDownload className="btn btn--primary w-full" />
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </header>
   );
 }
