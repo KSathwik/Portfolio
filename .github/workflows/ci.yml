@@ -36,6 +36,9 @@ jobs:
     needs: lint-and-build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    # The Vercel token is stored as a secret of this GitHub environment
+    # (Settings > Environments). Repository-level secrets are still visible too.
+    environment: VERCEL_TOKEN
 
     steps:
       - name: Checkout Code
@@ -55,7 +58,7 @@ jobs:
             echo "configured=true" >> "$GITHUB_OUTPUT"
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::warning title=Vercel deploy skipped::Add a VERCEL_TOKEN repository secret (Settings > Secrets and variables > Actions) to deploy to production."
+            echo "::warning title=Vercel deploy skipped::Add a VERCEL_TOKEN secret to the VERCEL_TOKEN environment or the repository to deploy to production."
           fi
 
       - name: Deploy to Vercel Production
