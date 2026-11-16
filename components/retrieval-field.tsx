@@ -317,7 +317,7 @@ function FieldLabel({ children, style }: { children: React.ReactNode; style: Rea
     <span
       aria-hidden="true"
       style={style}
-      className="label absolute hidden whitespace-nowrap bg-paper px-1.5 py-0.5 text-ink-2 sm:block"
+      className="label absolute z-[1] block whitespace-nowrap rounded-[3px] bg-paper px-1 py-px text-[11px] text-ink-2 sm:px-1.5 sm:py-0.5 sm:text-[length:var(--text-sm)]"
     >
       {children}
     </span>
