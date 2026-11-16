@@ -125,9 +125,6 @@ export function Hero() {
       {/* Banner: the RAG pipeline, sketched like a notebook page */}
       <div className="reveal">
         <SketchBanner />
-        <p className="wrap mt-2 text-right text-xs text-ink-3 sm:hidden" aria-hidden="true">
-          Swipe the sketch &rarr;
-        </p>
       </div>
 
       {/* About me, in my own words */}

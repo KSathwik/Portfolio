@@ -79,7 +79,8 @@ const boxes: Box[] = [
   { x: 846, y: 104, w: 120, h: 54, label: "reflect", sub: "is it grounded?", seed: 53, accent: true },
 ];
 
-export function SketchBanner() {
+/* Wide screens: the pipeline runs left to right. */
+function HorizontalSketch() {
   const arrows = [
     arrow([182, 131], [210, 131], 4, 1),
     arrow([330, 131], [372, 131], 6, 2),
@@ -95,8 +96,7 @@ export function SketchBanner() {
   const docs = [roughRect(70, 96, 92, 70, 71), roughRect(62, 104, 92, 70, 72), roughRect(54, 112, 92, 70, 73)];
 
   return (
-    <figure className="sketch-band m-0">
-      <div className="sketch-scroll">
+      <div className="sketch-scroll sketch-wide">
         <svg
           className="sketch"
           viewBox="0 0 1200 270"
@@ -136,11 +136,11 @@ export function SketchBanner() {
                 <path d={p1} className="sk-box" />
                 <path d={p1} className="sk-line" pathLength={1} />
                 <path d={p2} className="sk-line sk-faint" pathLength={1} />
-                <text x={b.x + b.w / 2} y={b.y + 26} textAnchor="middle" className="sk-mono">
+                <text x={b.x + b.w / 2} y={b.y + b.h * 0.48} textAnchor="middle" className="sk-mono">
                   {b.label}
                 </text>
                 {b.sub && (
-                  <text x={b.x + b.w / 2} y={b.y + 44} textAnchor="middle" className="sk-hand sk-sub">
+                  <text x={b.x + b.w / 2} y={b.y + b.h * 0.81} textAnchor="middle" className="sk-hand sk-sub">
                     {b.sub}
                   </text>
                 )}
@@ -206,6 +206,136 @@ export function SketchBanner() {
           </g>
         </svg>
       </div>
+  );
+}
+
+const vBoxes: Box[] = [
+  { x: 124, y: 216, w: 112, h: 48, label: "chunk", sub: "split by meaning", seed: 11 },
+  { x: 124, y: 296, w: 112, h: 48, label: "embed", sub: "MiniLM vectors", seed: 23 },
+  { x: 24, y: 388, w: 138, h: 48, label: "FAISS", sub: "dense / meaning", seed: 37 },
+  { x: 198, y: 388, w: 138, h: 48, label: "BM25", sub: "sparse / exact words", seed: 41 },
+  { x: 120, y: 580, w: 120, h: 48, label: "reflect", sub: "is it grounded?", seed: 53, accent: true },
+];
+
+const BUBBLE_V =
+  "M96,672 C140,664 220,664 264,672 C274,688 274,712 262,724 C230,730 160,730 128,726 L108,744 L112,724 C98,720 90,708 90,696 C90,684 92,676 96,672 Z";
+
+/* Phones: the same pipeline, drawn top to bottom so it fits the screen without swiping. */
+function VerticalSketch() {
+  const arrows = [
+    arrow([180, 184], [180, 212], 0, 1),
+    arrow([180, 268], [180, 292], 0, 2),
+    arrow([164, 348], [108, 384], 6, 3),
+    arrow([196, 348], [252, 384], 6, 4),
+    arrow([94, 440], [164, 500], -6, 5),
+    arrow([266, 440], [196, 500], -6, 6),
+    arrow([180, 550], [180, 576], 0, 7),
+    arrow([180, 632], [180, 662], 0, 8),
+  ];
+  const docs = [roughRect(148, 92, 70, 50, 71), roughRect(142, 98, 70, 50, 72), roughRect(136, 104, 70, 50, 73)];
+
+  return (
+    <svg className="sketch sketch--v" viewBox="0 0 360 760" aria-hidden="true" focusable="false">
+      <text x="24" y="36" className="sk-hand sk-title">
+        how my RAG assistant
+      </text>
+      <text x="24" y="62" className="sk-hand sk-title">
+        thinks, roughly
+      </text>
+      <path className="sk-line sk-note-line" pathLength={1} d="M24,72 C80,76 140,70 196,74" />
+
+      {docs.map(([a, b], i) => (
+        <g key={i} className="sk-paper">
+          <path d={a} className="sk-line" pathLength={1} style={{ "--d": `${i * 0.08}s` } as React.CSSProperties} />
+          <path d={b} className="sk-line sk-faint" pathLength={1} />
+        </g>
+      ))}
+      {[118, 128, 138, 148].map((y, i) => (
+        <path key={y} className="sk-line sk-faint" pathLength={1} d={`M144,${y} L${194 - i * 7},${y + 1}`} />
+      ))}
+      <text x="180" y="178" textAnchor="middle" className="sk-hand sk-label-sm">
+        your PDFs &amp; docs
+      </text>
+
+      {vBoxes.map((b, i) => {
+        const [p1, p2] = roughRect(b.x, b.y, b.w, b.h, b.seed);
+        return (
+          <g key={b.label} className={b.accent ? "sk-accent" : undefined} style={{ "--d": `${0.25 + i * 0.12}s` } as React.CSSProperties}>
+            <path d={p1} className="sk-box" />
+            <path d={p1} className="sk-line" pathLength={1} />
+            <path d={p2} className="sk-line sk-faint" pathLength={1} />
+            <text x={b.x + b.w / 2} y={b.y + b.h * 0.48} textAnchor="middle" className="sk-mono">
+              {b.label}
+            </text>
+            {b.sub && (
+              <text x={b.x + b.w / 2} y={b.y + b.h * 0.81} textAnchor="middle" className="sk-hand sk-sub">
+                {b.sub}
+              </text>
+            )}
+          </g>
+        );
+      })}
+
+      <g style={{ "--d": "0.8s" } as React.CSSProperties}>
+        <path d={roughCircle(180, 522, 26, 91)} className="sk-box" />
+        <path d={roughCircle(180, 522, 26, 91)} className="sk-line" pathLength={1} />
+        <text x="180" y="528" textAnchor="middle" className="sk-mono">
+          RRF
+        </text>
+      </g>
+
+      <g className="sk-answer" style={{ "--d": "1.1s" } as React.CSSProperties}>
+        <path className="sk-box sk-box--answer" d={BUBBLE_V} />
+        <path className="sk-line" pathLength={1} d={BUBBLE_V} />
+        <text x="180" y="694" textAnchor="middle" className="sk-mono">
+          answer
+        </text>
+        <text x="180" y="716" textAnchor="middle" className="sk-hand sk-cite">
+          + sources [1] [2]
+        </text>
+      </g>
+
+      {arrows.map((a, i) => (
+        <g key={i} className="sk-arrow" style={{ "--d": `${0.35 + i * 0.1}s` } as React.CSSProperties}>
+          <path d={a.shaft} className="sk-line" pathLength={1} />
+          <path d={a.head} className="sk-line" pathLength={1} />
+        </g>
+      ))}
+
+      {/* Retry loop: a weak draft goes back up for better context */}
+      <g className="sk-note" style={{ "--d": "1.4s" } as React.CSSProperties}>
+        <path d="M244,606 C320,606 348,522 304,444" className="sk-line sk-dash" />
+        <path d="M296,453 L304,442 L311,454" className="sk-line" pathLength={1} />
+        <text x="252" y="640" className="sk-hand sk-note-text sk-note-sm">
+          not grounded?
+        </text>
+        <text x="252" y="657" className="sk-hand sk-note-text sk-note-sm">
+          fetch again
+        </text>
+      </g>
+
+      <g className="sk-note" style={{ "--d": "1.6s" } as React.CSSProperties}>
+        <text x="180" y="462" textAnchor="middle" className="sk-hand sk-note-text sk-note-sm">
+          both, not either
+        </text>
+        <text x="20" y="516" className="sk-hand sk-note-text sk-note-sm">
+          fuse the
+        </text>
+        <text x="20" y="534" className="sk-hand sk-note-text sk-note-sm">
+          two rankings
+        </text>
+        <path className="sk-line" pathLength={1} d="M114,528 C128,530 140,528 150,524" />
+        <path className="sk-line" pathLength={1} d="M143,519 L151,524 L143,530" />
+      </g>
+    </svg>
+  );
+}
+
+export function SketchBanner() {
+  return (
+    <figure className="sketch-band m-0">
+      <HorizontalSketch />
+      <VerticalSketch />
       <figcaption className="visually-hidden">
         A hand-drawn sketch of a retrieval-augmented generation pipeline: documents are chunked and
         embedded, searched two ways (FAISS for meaning and BM25 for exact words), the rankings are
