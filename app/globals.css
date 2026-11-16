@@ -417,3 +417,10 @@
   .sketch-wide { display: none; }
   .sketch.sketch--v { display: block; width: 100%; min-width: 0; max-width: 400px; height: auto; margin-inline: auto; padding: 12px 16px 8px 28px; box-sizing: border-box; }
 }
+
+/* About on phones: the numbers sit two by two; off the clock is a card of its own. */
+@media (max-width: 63.99rem) {
+  .facts--grid { grid-template-columns: 1fr 1fr; column-gap: 20px; }
+  .off-card { padding: 20px; border: 1px solid var(--color-rule); border-radius: var(--radius-card); background: var(--color-paper-2); }
+  .off-card .polaroid { margin-top: 8px; }
+}

@@ -129,115 +129,127 @@ export function Hero() {
 
       {/* About me, in my own words */}
       <div className="wrap py-[var(--section-gap-s)]">
-        <div className="grid gap-x-[var(--gap-columns)] gap-y-12 lg:grid-cols-12">
-          <div className="reveal flex min-w-0 flex-col gap-5 lg:col-span-7">
-            <span className="section-mark">01 About</span>
-            <h2 className="kicker-title">The part of AI that has to work every day</h2>
-            <p className="text-[length:var(--text-lead)] leading-[1.5] text-ink">
-              Since {current.duration.split(" –")[0]} I&apos;ve been an {current.role} at{" "}
-              {current.company} in {city}, writing Python backends and REST APIs and shipping AI
-              features into enterprise software: a support-ticket assistant built on RAG and semantic
-              search, and a multi-agent email system with planning, generation and reflection agents.
-            </p>
-            <p className="text-ink-2">
-              I studied {degree.field.replace(" – ", ", ")} at {degree.institution.split(",")[0]},
-              then interned at Venago Innovations building serverless Python APIs on AWS. That mix of
-              data science and backend work still shapes how I build: retrieval, agents and models on
-              the inside, solid APIs, auth and deployment around them.
-            </p>
-
-            <div className="mt-4 grid gap-8 sm:grid-cols-2">
-              <div className="flex min-w-0 flex-col gap-3">
-                <h3 className="text-[length:var(--text-lg)]">What I&apos;m curious about</h3>
-                <ul className="ticks">
-                  {interests.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-              <div className="flex min-w-0 flex-col gap-3">
-                <h3 className="text-[length:var(--text-lg)]">Where I&apos;m heading</h3>
-                <p className="text-ink-2">
-                  I want to grow into an AI engineer who owns systems end to end, from retrieval and
-                  evaluation to the APIs, security and cloud they run on. I&apos;m open to software
-                  engineering, backend and AI engineer roles.
+        {/*
+          Two columns on desktop. On phones the column wrappers dissolve (display: contents) so the
+          parts read in this order: story, the numbers, interests and goals, then off the clock.
+        */}
+        <div className="grid grid-cols-1 gap-x-[var(--gap-columns)] gap-y-12 lg:grid-cols-12">
+          <div className="contents lg:col-span-7 lg:flex lg:min-w-0 lg:flex-col lg:gap-12">
+            <div className="reveal order-1 flex min-w-0 flex-col gap-5 lg:order-none">
+                <span className="section-mark">01 About</span>
+                <h2 className="kicker-title">The part of AI that has to work every day</h2>
+                <p className="text-[length:var(--text-lead)] leading-[1.5] text-ink">
+                  Since {current.duration.split(" –")[0]} I&apos;ve been an {current.role} at{" "}
+                  {current.company} in {city}, writing Python backends and REST APIs and shipping AI
+                  features into enterprise software: a support-ticket assistant built on RAG and semantic
+                  search, and a multi-agent email system with planning, generation and reflection agents.
                 </p>
-                <a href="#contact" className="link inline-flex min-h-11 w-fit items-center">
-                  <Mail size={14} aria-hidden="true" className="mr-1.5 inline align-[-2px]" />
-                  Let&apos;s talk
-                </a>
-              </div>
+                <p className="text-ink-2">
+                  I studied {degree.field.replace(" – ", ", ")} at {degree.institution.split(",")[0]},
+                  then interned at Venago Innovations building serverless Python APIs on AWS. That mix of
+                  data science and backend work still shapes how I build: retrieval, agents and models on
+                  the inside, solid APIs, auth and deployment around them.
+                </p>
+            </div>
+
+            <div className="reveal order-3 grid min-w-0 gap-8 sm:grid-cols-2 lg:order-none">
+                <div className="flex min-w-0 flex-col gap-3">
+                  <h3 className="text-[length:var(--text-lg)]">What I&apos;m curious about</h3>
+                  <ul className="ticks">
+                    {interests.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="flex min-w-0 flex-col gap-3">
+                  <h3 className="text-[length:var(--text-lg)]">Where I&apos;m heading</h3>
+                  <p className="text-ink-2">
+                    I want to grow into an AI engineer who owns systems end to end, from retrieval and
+                    evaluation to the APIs, security and cloud they run on. I&apos;m open to software
+                    engineering, backend and AI engineer roles.
+                  </p>
+                  <a href="#contact" className="link inline-flex min-h-11 w-fit items-center">
+                    <Mail size={14} aria-hidden="true" className="mr-1.5 inline align-[-2px]" />
+                    Let&apos;s talk
+                  </a>
+                </div>
             </div>
           </div>
 
-          {/* The person behind the code: a candid photo, the off-hours, and the quick facts */}
-          <aside className="reveal flex min-w-0 flex-col gap-10 lg:col-span-4 lg:col-start-9" aria-label="Away from the keyboard and quick facts">
-            <figure className="polaroid polaroid--sm mx-auto lg:mx-0">
-              <div className="polaroid-img aspect-[4/3]">
-                <Image
-                  src="/images/sathwik-on-stage.jpg"
-                  alt="Sathwik speaking at a podium on stage, smiling, holding notes"
-                  fill
-                  sizes="260px"
-                />
-              </div>
-              <figcaption>caught mid-sentence, on stage</figcaption>
-            </figure>
-
-            {/* Off the clock, at a glance: a few of my photos and who's on my playlist */}
-            <div className="flex flex-col gap-4">
-              <div className="grid gap-1">
-                <h3 className="text-[length:var(--text-lg)]">Off the clock</h3>
-                <p className="text-ink-2">
-                  Music on while I code, a good movie on weekends, and a camera whenever I travel.
-                </p>
-              </div>
-
-              {GALLERY_PHOTOS.length > 0 && (
-                <div className="grid gap-2">
-                  <ul className="m-0 grid list-none grid-cols-4 gap-2 p-0">
-                    {GALLERY_PHOTOS.slice(0, 4).map((p, i) => (
-                      <li key={p.src}>
-                        <a
-                          href="#through-my-lens"
-                          className="peek-thumb"
-                          style={{ "--tilt": `${[-3, 2, -1.5, 2.5][i]}deg` } as React.CSSProperties}
-                          aria-label={`${p.alt} (see all my photos)`}
-                        >
-                          <Image src={p.src} alt="" fill sizes="80px" />
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                  <a href="#through-my-lens" className="link inline-flex min-h-11 w-fit items-center text-sm">
-                    See all {GALLERY_PHOTOS.length} photos
-                  </a>
-                </div>
-              )}
-
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <a href="#off-the-clock" className="peek-artists" aria-label="See the artists on my playlist">
-                  {MUSIC_ARTISTS.map((a) => (
-                    <span key={a.spotifyId} className="peek-artist" title={a.name}>
-                      <Image src={a.image} alt="" fill sizes="40px" />
-                    </span>
-                  ))}
-                </a>
-                <a href="#off-the-clock" className="link inline-flex min-h-11 items-center text-sm">
-                  See what&apos;s on my playlist
-                </a>
-              </div>
+          <div className="contents lg:col-span-4 lg:col-start-9 lg:flex lg:min-w-0 lg:flex-col lg:gap-12">
+            {/* The numbers, under their own heading */}
+            <div className="reveal order-2 flex min-w-0 flex-col gap-4 lg:order-2">
+              <h3 className="text-[length:var(--text-lg)]">By the numbers</h3>
+              <dl className="facts facts--grid min-w-0">
+                {facts.map((f) => (
+                  <div key={f.label} className="fact">
+                    <dt className="text-sm text-ink-3">{f.label}</dt>
+                    <dd>{f.value}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
 
-            <dl className="facts min-w-0">
-              {facts.map((f) => (
-                <div key={f.label} className="fact">
-                  <dt className="text-sm text-ink-3">{f.label}</dt>
-                  <dd>{f.value}</dd>
+            {/* The person behind the code: on phones a card of its own, so it reads as an aside */}
+            <div className="reveal off-card order-4 flex min-w-0 flex-col gap-8 lg:order-1">
+                <figure className="polaroid polaroid--sm mx-auto lg:mx-0">
+                  <div className="polaroid-img aspect-[4/3]">
+                    <Image
+                      src="/images/sathwik-on-stage.jpg"
+                      alt="Sathwik speaking at a podium on stage, smiling, holding notes"
+                      fill
+                      sizes="260px"
+                    />
+                  </div>
+                  <figcaption>caught mid-sentence, on stage</figcaption>
+                </figure>
+
+                {/* Off the clock, at a glance: a few of my photos and who's on my playlist */}
+                <div className="flex flex-col gap-4">
+                  <div className="grid gap-1">
+                    <h3 className="text-[length:var(--text-lg)]">Off the clock</h3>
+                    <p className="text-ink-2">
+                      Music on while I code, a good movie on weekends, and a camera whenever I travel.
+                    </p>
+                  </div>
+
+                  {GALLERY_PHOTOS.length > 0 && (
+                    <div className="grid gap-2">
+                      <ul className="m-0 grid list-none grid-cols-4 gap-2 p-0">
+                        {GALLERY_PHOTOS.slice(0, 4).map((p, i) => (
+                          <li key={p.src}>
+                            <a
+                              href="#through-my-lens"
+                              className="peek-thumb"
+                              style={{ "--tilt": `${[-3, 2, -1.5, 2.5][i]}deg` } as React.CSSProperties}
+                              aria-label={`${p.alt} (see all my photos)`}
+                            >
+                              <Image src={p.src} alt="" fill sizes="80px" />
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                      <a href="#through-my-lens" className="link inline-flex min-h-11 w-fit items-center text-sm">
+                        See all {GALLERY_PHOTOS.length} photos
+                      </a>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <a href="#off-the-clock" className="peek-artists" aria-label="See the artists on my playlist">
+                      {MUSIC_ARTISTS.map((a) => (
+                        <span key={a.spotifyId} className="peek-artist" title={a.name}>
+                          <Image src={a.image} alt="" fill sizes="40px" />
+                        </span>
+                      ))}
+                    </a>
+                    <a href="#off-the-clock" className="link inline-flex min-h-11 items-center text-sm">
+                      See what&apos;s on my playlist
+                    </a>
+                  </div>
                 </div>
-              ))}
-            </dl>
-          </aside>
+            </div>
+          </div>
         </div>
       </div>
     </section>
