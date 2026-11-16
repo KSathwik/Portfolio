@@ -34,9 +34,9 @@ export function OffTheClock() {
           </p>
         </div>
 
-        <div className="grid gap-x-[var(--gap-columns)] gap-y-8 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-x-[var(--gap-columns)] gap-y-8 lg:grid-cols-12">
           {/* Artist picker */}
-          <div className="reveal lg:col-span-5">
+          <div className="reveal min-w-0 lg:col-span-5">
             <ul className="artist-grid m-0 list-none p-0" role="list">
               {MUSIC_ARTISTS.map((artist, i) => {
                 const selected = artist.spotifyId === activeId;

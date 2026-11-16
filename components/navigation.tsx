@@ -168,7 +168,7 @@ export function Navigation() {
             aria-hidden="true"
             className="grid h-9 w-9 place-items-center rounded-full border border-rule-2 bg-transparent font-display text-[15px] font-medium text-ink transition-colors duration-[var(--dur-short)] group-hover:border-ink-3"
           >
-            sk
+            SK
           </span>
           <span className="whitespace-nowrap font-display text-lg font-medium tracking-[var(--tracking-display)] max-[25rem]:hidden">
             {PERSONAL_INFO.name}

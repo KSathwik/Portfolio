@@ -389,6 +389,7 @@
   .artist-grid { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(var(--gutter) * -1); padding: 2px var(--gutter) 6px; }
   .artist-grid::-webkit-scrollbar { display: none; }
   .artist-grid > li { flex: none; scroll-snap-align: start; }
+  .artist-grid > li:last-child { padding-right: var(--gutter); scroll-snap-align: end; }
   .artist { width: auto; padding: 6px 14px 6px 6px; border-radius: 999px; }
   .artist .text-xs { display: none; }
   .artist-photo { width: 40px; height: 40px; }
@@ -409,3 +410,10 @@
 /* Project cards: a live drawing across the top, like the featured card's. */
 .project-visual { position: relative; border-bottom: 1px solid var(--color-rule); background: var(--color-paper-2); transition: background-color var(--dur-short); }
 .card--lift:hover .project-visual { background: var(--color-signal-wash); }
+
+/* The banner sketch: horizontal on wider screens, vertical on phones (no swiping). */
+.sketch--v { display: none; }
+@media (max-width: 39.99rem) {
+  .sketch-wide { display: none; }
+  .sketch.sketch--v { display: block; width: 100%; min-width: 0; max-width: 400px; height: auto; margin-inline: auto; padding: 12px 16px 8px 28px; box-sizing: border-box; }
+}
