@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "avatars.githubusercontent.com",
       },
+      {
+        // Artist photos for the music section, served by Spotify.
+        protocol: "https",
+        hostname: "i.scdn.co",
+      },
     ],
   },
 };

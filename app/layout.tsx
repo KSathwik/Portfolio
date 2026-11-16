@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Fraunces, Geist, Geist_Mono } from "next/font/google";
+import { Caveat, Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { PERSONAL_INFO } from "@/data/portfolio-data";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -18,13 +19,25 @@ const geist = Geist({
   display: "swap",
 });
 
+/* Handwriting, used sparingly: margin notes, the banner sketch, photo captions. */
+const caveat = Caveat({
+  variable: "--font-caveat",
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  display: "swap",
+});
+
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
 });
 
+const SITE_URL = "https://portfolio-sathwik-k.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
   title: "Sathwik Katkam — Software Engineer, AI & Backend",
   description:
     "I build Python backends and retrieval systems that hold up in production: RAG pipelines, multi-agent workflows and the FastAPI services around them.",
@@ -46,17 +59,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://sathwikkatkam.dev",
-    title: "Sathwik Katkam | Associate Software Engineer",
+    url: "/",
+    title: "Sathwik Katkam — Software Engineer, AI & Backend",
     description:
-      "Associate Software Engineer specializing in Backend Development, Generative AI, and Enterprise Applications.",
+      "Python backends and retrieval systems that hold up in production: RAG pipelines, multi-agent workflows and FastAPI services.",
     siteName: "Sathwik Katkam Portfolio",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sathwik Katkam | Associate Software Engineer",
+    title: "Sathwik Katkam — Software Engineer, AI & Backend",
     description:
-      "Associate Software Engineer specializing in Backend Development, Generative AI, and Enterprise Applications.",
+      "Python backends and retrieval systems that hold up in production: RAG pipelines, multi-agent workflows and FastAPI services.",
   },
   robots: {
     index: true,
@@ -77,7 +90,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${fraunces.variable} ${geist.variable} ${geistMono.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${fraunces.variable} ${geist.variable} ${geistMono.variable} ${caveat.variable}`}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <script
@@ -87,7 +100,9 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Person",
               name: "Sathwik Katkam",
-              url: "https://sathwikkatkam.dev",
+              url: SITE_URL,
+              image: `${SITE_URL}/images/sathwik-portrait.jpg`,
+              email: "mailto:sathwikkatkam@gmail.com",
               jobTitle: "Associate Software Engineer",
               worksFor: {
                 "@type": "Organization",
@@ -97,10 +112,7 @@ export default function RootLayout({
                 "@type": "CollegeOrUniversity",
                 name: "ACE Engineering College",
               },
-              sameAs: [
-                "https://github.com/KSathwik",
-                "https://linkedin.com/in/katkam-sathwik-5b5285202",
-              ],
+              sameAs: [PERSONAL_INFO.github, PERSONAL_INFO.linkedin],
             }),
           }}
         />

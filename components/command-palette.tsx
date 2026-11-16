@@ -160,7 +160,7 @@ export function CommandPalette() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search projects, skills, experience or certifications"
               aria-label="Search the portfolio"
-              className="input pl-9 text-sm"
+              className="input pl-9 text-base sm:text-sm"
             />
           </div>
           <button type="button" onClick={close} className="btn btn--icon btn--ghost" aria-label="Close search">

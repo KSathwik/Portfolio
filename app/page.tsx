@@ -1,5 +1,3 @@
-"use client";
-
 import { Navigation } from "@/components/navigation";
 import { BackToTop } from "@/components/back-to-top";
 import { Hero } from "@/components/sections/hero";
@@ -12,12 +10,17 @@ import { Education } from "@/components/sections/education";
 import { Contact } from "@/components/sections/contact";
 import { Footer } from "@/components/footer";
 import { PortfolioChatbot } from "@/components/ai/portfolio-chatbot";
+import { OffTheClock } from "@/components/sections/off-the-clock";
+import { RevealObserver } from "@/components/reveal-observer";
 
 export default function Home() {
   return (
     <>
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
       <Navigation />
-      <main>
+      <main id="main" tabIndex={-1} className="outline-none">
         {/* About me comes first: who I am, then what I've built. */}
         <Hero />
         <Projects />
@@ -27,7 +30,7 @@ export default function Home() {
         {/* Education and certifications share one band, side by side. */}
         <section aria-labelledby="education-title" className="section section--tint">
           <div className="wrap">
-            <div className="section-head">
+            <div className="section-head reveal">
               <span className="section-mark">06 Education</span>
               <h2 id="education-title" className="kicker-title">Education and certifications</h2>
             </div>
@@ -37,11 +40,13 @@ export default function Home() {
             </div>
           </div>
         </section>
+        <OffTheClock />
         <Contact />
       </main>
       <Footer />
       <BackToTop />
       <PortfolioChatbot />
+      <RevealObserver />
     </>
   );
 }

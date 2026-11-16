@@ -75,7 +75,7 @@
 
 @layer components {
   /* ---------- Layout ---------- */
-  .section { padding-block: var(--section-gap-s); scroll-margin-top: 48px; }
+  .section { padding-block: var(--section-gap-s); scroll-margin-top: 72px; }
   .section--tint { background: var(--color-paper-2); }
   .section-head { display: grid; gap: var(--space-sm); margin-bottom: var(--space-2xl); max-width: 46rem; }
   .section-head p { color: var(--color-ink-2); font-size: var(--text-lead); line-height: 1.5; max-width: 52ch; }
@@ -97,7 +97,7 @@
     transition: transform var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
   }
   .btn:hover, .key:hover { border-color: var(--color-ink-3); transform: translateY(-1px); }
-  .btn:active, .key:active { transform: translateY(0); box-shadow: var(--shadow-key-press); }
+  .btn:active, .key:active { transform: translateY(0) scale(0.97); box-shadow: var(--shadow-key-press); transition-duration: 80ms; }
   .btn:focus-visible, .key:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
   .btn:disabled, .key:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
   .btn--primary, .key--primary { background: var(--color-signal-fill); border-color: var(--color-signal-fill); color: var(--color-signal-fill-ink); box-shadow: var(--shadow-key-accent); }
@@ -145,16 +145,50 @@
   .intro { position: relative; scroll-margin-top: 64px; }
   .name { max-width: 12ch; font-size: var(--text-display); line-height: 0.98; font-weight: 450; font-variation-settings: "SOFT" 60, "opsz" 144; letter-spacing: -0.035em; }
 
-  /* The source is a candid square photo with the subject small and off-centre (face near 60% / 54%).
-   * Scaling by s around an origin of (s*p - f) / (s - 1) per axis moves source point p to frame point f;
-   * here f is 50% / 42% (head and shoulders). An origin inside 0-100% keeps the frame fully covered. */
-  .portrait { position: relative; aspect-ratio: 1; width: 128px; overflow: hidden; border-radius: 20px; outline: 1px solid var(--color-rule); outline-offset: -1px; background: var(--color-paper-3); }
-  .portrait img { object-fit: cover; object-position: 60% 54%; transform: scale(2); transform-origin: 69.5% 66%; }
-  @media (min-width: 64rem) { .portrait { width: clamp(160px, 22vw, 280px); max-width: 100%; } }
+  /* Photos sit in a print frame, slightly turned, held on by a strip of tape: a real photo on a page. */
+  .polaroid { position: relative; width: min(100%, 300px); margin: 0; padding: 10px 10px 44px; background: var(--color-print); border-radius: 4px; box-shadow: var(--shadow-print); transform: rotate(var(--tilt, -2deg)); transition: transform var(--dur-short) var(--ease-out); }
+  .polaroid:hover { transform: rotate(0deg) translateY(-2px); }
+  .polaroid::before { content: ""; position: absolute; top: -12px; left: 50%; width: 88px; height: 26px; transform: translateX(-50%) rotate(-3deg); background: var(--color-tape); border-left: 1px dashed rgb(0 0 0 / 0.06); border-right: 1px dashed rgb(0 0 0 / 0.06); }
+  .polaroid-img { position: relative; overflow: hidden; border-radius: 2px; background: var(--color-paper-3); }
+  .polaroid-img img { object-fit: cover; }
+  .polaroid figcaption { position: absolute; inset: auto 10px 8px; font: 600 1.375rem/1.1 var(--font-hand); color: var(--color-print-ink); text-align: center; }
+  .polaroid--sm { width: min(100%, 260px); padding: 8px 8px 40px; --tilt: 2.5deg; }
+  .polaroid--sm figcaption { font-size: 1.2rem; }
 
-  /* The signature band under the introduction: the retrieval field, quiet and decorative. */
-  .signature { opacity: 0.55; }
-  .dark .signature { opacity: 0.4; }
+  /* Handwritten margin notes, in the terracotta "pen". */
+  .hand { font-family: var(--font-hand); font-weight: 600; color: var(--color-clay); line-height: 1.15; }
+  .hand-note { display: inline-flex; align-items: flex-end; gap: 6px; font: 600 1.375rem/1.1 var(--font-hand); color: var(--color-clay); transform: rotate(-2deg); }
+
+  /* "Open to work" status: a quiet live dot. */
+  .status-dot { position: relative; width: 8px; height: 8px; border-radius: 999px; background: var(--color-success); flex: none; }
+  .status-dot::after { content: ""; position: absolute; inset: -4px; border-radius: inherit; border: 1.5px solid var(--color-success); opacity: 0; }
+  @media (prefers-reduced-motion: no-preference) { .status-dot::after { animation: status-ping 2.4s var(--ease-out) infinite; } }
+  @keyframes status-ping { 0% { opacity: 0.6; transform: scale(0.6); } 80%, 100% { opacity: 0; transform: scale(1.4); } }
+
+  /* ---------- The banner: a notebook page with the RAG pipeline sketched on it ---------- */
+  .sketch-band { position: relative; border-block: 1px solid var(--color-rule); background-color: var(--color-paper-2); background-image: radial-gradient(circle, var(--color-rule-2) 1px, transparent 1.4px); background-size: 22px 22px; background-position: 11px 11px; }
+  /* The red margin line of a school notebook. */
+  .sketch-band::before { content: ""; position: absolute; inset-block: 0; left: clamp(16px, 4vw, 56px); width: 1.5px; background: color-mix(in srgb, var(--color-clay) 45%, transparent); pointer-events: none; }
+  .sketch-scroll { overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .sketch-scroll::-webkit-scrollbar { display: none; }
+  .sketch { display: block; width: 100%; min-width: 760px; max-width: 1200px; height: auto; margin-inline: auto; padding-inline: clamp(24px, 5vw, 64px); box-sizing: content-box; }
+  .sk-line { fill: none; stroke: var(--color-ink-2); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .sk-faint { stroke-width: 0.9; opacity: 0.55; }
+  .sk-box { fill: var(--color-paper); stroke: none; }
+  .sk-box--answer { fill: var(--color-signal-wash); }
+  .sk-accent .sk-box { fill: var(--color-clay-wash); }
+  .sk-dash { stroke: var(--color-clay); stroke-dasharray: 5 6; }
+  .sk-note .sk-line { stroke: var(--color-clay); }
+  .sk-mono { font: 500 15px var(--font-outlier); fill: var(--color-ink); letter-spacing: -0.01em; }
+  .sk-hand { font-family: var(--font-hand); font-weight: 600; fill: var(--color-ink-3); }
+  .sk-title { font-size: 26px; fill: var(--color-ink); }
+  .sk-note-line { stroke: var(--color-clay); stroke-width: 2.2; opacity: 0.8; }
+  .sk-sub { font-size: 16px; }
+  .sk-label-sm { font-size: 18px; }
+  .sk-cite { font-size: 18px; fill: var(--color-signal); }
+  .sk-note-text { font-size: 20px; fill: var(--color-clay); }
+  .sk-note-sm { font-size: 17px; }
+  .scroll-hint { font: 600 1.125rem/1 var(--font-hand); color: var(--color-ink-3); }
 
   .facts { display: grid; margin: 0; border-top: 1px solid var(--color-rule); }
   .fact { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: 4px; padding-block: var(--space-md); border-bottom: 1px solid var(--color-rule); }
@@ -165,8 +199,62 @@
   @media (min-width: 64rem) { .featured { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); } }
   .featured-visual { position: relative; border-bottom: 1px solid var(--color-rule); background: var(--color-paper-2); }
   @media (min-width: 64rem) { .featured-visual { border-bottom: 0; border-left: 1px solid var(--color-rule); order: 2; } }
-  .metric { display: grid; gap: 4px; }
-  .metric strong { font: 500 var(--text-xl)/1.1 var(--font-outlier); color: var(--color-signal); letter-spacing: -0.02em; }
+
+
+  /* ---------- Logos: companies and certificate issuers, on a white tile so every mark reads in both themes ---------- */
+  /* Height is fixed; width follows the mark, so wordmarks (PrimeSoft, IBM) stay legible. */
+  .logo-tile { display: inline-flex; align-items: center; justify-content: center; width: fit-content; min-width: 56px; height: 56px; padding: 9px; border: 1px solid var(--color-rule); border-radius: 12px; background: #ffffff; box-shadow: var(--shadow-card); transition: transform var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out); }
+  .logo-tile img { height: 100%; width: auto; max-width: 112px; object-fit: contain; }
+  .logo-tile--fill { width: 56px; padding: 0; overflow: hidden; border-color: transparent; }
+  .logo-tile--fill img { width: 100%; height: 100%; max-width: none; }
+
+  /* The experience ruler: a line that draws down beside each role. */
+  .ruler::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--color-rule-2); transform-origin: top; }
+
+  /* ---------- WhatsApp ---------- */
+  /* WhatsApp green, darkened for AA contrast with white text (about 5.4:1). */
+  .btn--whatsapp { background: #157a3f; border-color: #157a3f; color: #ffffff; }
+  .btn--whatsapp:hover { background: #11663a; border-color: #11663a; color: #ffffff; }
+
+  /* ---------- Off the clock: artist picker, player, gallery ---------- */
+  .artist-grid { display: grid; gap: 8px; grid-template-columns: 1fr; }
+  @media (min-width: 40rem) and (max-width: 63.99rem) { .artist-grid { grid-template-columns: 1fr 1fr; } }
+  .artist { display: flex; width: 100%; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; border: 1px solid var(--color-rule); border-radius: 14px; background: var(--color-paper); text-align: left; cursor: pointer; transition: border-color var(--dur-micro), background-color var(--dur-micro), transform var(--dur-short) var(--ease-out); }
+  .artist:hover { border-color: var(--color-rule-2); transform: translateY(-1px); }
+  .artist[aria-pressed="true"] { border-color: var(--color-signal); background: var(--color-signal-wash); }
+  .artist:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+  .artist-photo { position: relative; width: 48px; height: 48px; flex: none; overflow: hidden; border-radius: 999px; background: var(--color-paper-3); }
+  .artist-photo img { object-fit: cover; }
+  /* Three bars bouncing like a level meter on the artist that's playing. */
+  .artist-eq { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; gap: 3px; padding-bottom: 12px; background: rgb(0 0 0 / 0.38); }
+  .artist-eq i { width: 4px; height: 8px; border-radius: 2px; background: #ffffff; }
+  @media (prefers-reduced-motion: no-preference) {
+    .artist-eq i { animation: eq 0.9s var(--ease-in-out) infinite alternate; }
+    .artist-eq i:nth-child(2) { animation-delay: -0.3s; }
+    .artist-eq i:nth-child(3) { animation-delay: -0.6s; }
+  }
+  @keyframes eq { from { height: 5px; } to { height: 20px; } }
+  .player { overflow: hidden; border-radius: 16px; border: 1px solid var(--color-rule); background: var(--color-paper-2); box-shadow: var(--shadow-lift); }
+  .player iframe { display: block; border: 0; }
+  /* A wall of prints: CSS columns keep each photo's own shape (portrait or landscape). */
+  .gallery { columns: 3 260px; column-gap: 32px; }
+  .gallery-item { break-inside: avoid; margin-bottom: 40px; padding-top: 14px; }
+  .gallery-print { width: 100%; }
+  .gallery-open { position: relative; display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
+  .gallery-open:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 4px; border-radius: 2px; }
+  .gallery-zoom { position: absolute; right: 10px; bottom: 10px; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 999px; background: rgb(0 0 0 / 0.45); color: #fff; opacity: 0; transition: opacity var(--dur-short); }
+  .gallery-open:hover .gallery-zoom, .gallery-open:focus-visible .gallery-zoom { opacity: 1; }
+
+  /* Lightbox: the photo large, caption under it, arrows at the sides. */
+  .lightbox { width: min(1100px, calc(100vw - 32px)); padding: 16px; overflow: visible; background: var(--color-paper); }
+  .lightbox-frame { position: relative; width: 100%; max-height: calc(100svh - 150px); margin-inline: auto; overflow: hidden; border-radius: 6px; background: var(--color-paper-3); }
+  .lightbox-frame { max-width: calc((100svh - 150px) * var(--ar, 10)); }
+  .lightbox-img { object-fit: contain; }
+  .lightbox-close { position: absolute; top: -14px; right: -14px; box-shadow: var(--shadow-lift); }
+  .lightbox-nav { position: absolute; top: 50%; margin-top: -22px; box-shadow: var(--shadow-lift); }
+  .lightbox-prev { left: -14px; }
+  .lightbox-next { right: -14px; }
+  @media (max-width: 40rem) { .lightbox-prev { left: 4px; } .lightbox-next { right: 4px; } .lightbox-close { top: 4px; right: 4px; } }
 
   /* ---------- Dialogs: native <dialog> opened with showModal(). Callers set the width. ---------- */
   .dialog { margin: auto; padding: 0; max-width: calc(100vw - 32px); max-height: calc(100svh - 32px); overflow: auto; overscroll-behavior: contain; border: 1px solid var(--color-rule); border-radius: var(--radius-card); background: var(--color-paper); color: var(--color-ink); box-shadow: var(--shadow-lift); }
@@ -179,8 +267,145 @@
 /* ---------- Motion: CSS only, so content is visible without script; all of it off under reduced motion. ---------- */
 @media (prefers-reduced-motion: no-preference) {
   .enter { animation: enter var(--dur-long) var(--ease-out) both; animation-delay: calc(min(var(--i, 0), 4) * 60ms + 60ms); }
-  @supports (animation-timeline: view()) {
-    .reveal { animation: enter linear both; animation-timeline: view(); animation-range: entry 0% entry 35%; }
+}
+
+/* ---------- Scroll reveals, driven by RevealObserver (adds .is-in once). Hidden only when motion is on and the observer is ready. ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .motion-ready .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out); transition-delay: calc(min(var(--i, 0), 6) * 70ms); }
+  .motion-ready .reveal.is-in { opacity: 1; transform: none; }
+
+  /* Children that arrive one after another once their parent is in. */
+  .motion-ready .reveal .stagger > * { opacity: 0; transform: translateY(8px) scale(0.96); transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out); transition-delay: calc(150ms + min(var(--i, 0), 12) * 35ms); }
+  .motion-ready .reveal.is-in .stagger > * { opacity: 1; transform: none; }
+
+  /* Section labels: the short rule after "02 Projects" draws out. */
+  .motion-ready .reveal .section-mark::after { width: 0; transition: width 0.8s var(--ease-out) 0.2s; }
+  .motion-ready .reveal.is-in .section-mark::after { width: 32px; }
+
+  /* Experience: the ruler line draws down the role. */
+  .motion-ready .reveal .ruler::before { transform: scaleY(0); transition: transform 1.1s var(--ease-out) 0.15s; }
+  .motion-ready .reveal.is-in .ruler::before { transform: scaleY(1); }
+
+  /* Logos settle in with a small turn. */
+  .motion-ready .reveal .logo-tile { opacity: 0; transform: rotate(-8deg) scale(0.85); transition: opacity 0.5s var(--ease-out) 0.15s, transform 0.6s var(--ease-out) 0.15s, box-shadow var(--dur-short); }
+  .motion-ready .reveal.is-in .logo-tile { opacity: 1; transform: none; }
+
+  /* Cards get a gentle lift on hover everywhere they're used. */
+  .card:not(.featured) { transition: opacity 0.7s var(--ease-out), transform var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out); }
+  .motion-ready .card.reveal:not(.is-in) { transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out); transition-delay: calc(min(var(--i, 0), 6) * 70ms); }
+  .card:not(.featured):hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); border-color: var(--color-rule-2); }
+  .tag { transition: border-color var(--dur-micro), color var(--dur-micro), background-color var(--dur-micro); }
+  .tag:hover { border-color: var(--color-signal); color: var(--color-signal-deep); }
+
+  /* The featured project's visual picks up a soft tint on hover. */
+  .featured .featured-visual { transition: background-color var(--dur-short); }
+  .featured:hover .featured-visual { background-color: var(--color-signal-wash); }
+}
+
+/* The sketch draws itself once, pen-stroke by pen-stroke. Without motion it is simply there. */
+@media (prefers-reduced-motion: no-preference) {
+  .sketch .sk-line[pathLength] { stroke-dasharray: 1; stroke-dashoffset: 1; animation: sk-draw 0.9s var(--ease-in-out) forwards; animation-delay: calc(var(--d, 0s) + 0.3s); }
+  .sketch g .sk-line[pathLength] { animation-delay: calc(var(--d, 0s) + 0.3s); }
+  .sketch text, .sketch .sk-box, .sketch .sk-dash { opacity: 0; animation: sk-fade 0.6s var(--ease-out) forwards; animation-delay: calc(var(--d, 0s) + 0.6s); }
+}
+@keyframes sk-draw { to { stroke-dashoffset: 0; } }
+@keyframes sk-fade { to { opacity: 1; } }
+@keyframes enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* ======================================================================
+ * Transitions and wayfinding. Unlayered on purpose, so these win over
+ * component and utility layers (dialogs carry width utilities).
+ * ====================================================================== */
+
+/* The nav pill that slides to the section being read. */
+.nav-pill { position: absolute; left: 0; top: 50%; height: 38px; margin-top: -19px; border-radius: 999px; background: var(--color-paper-3); transition: transform 0.45s var(--ease-out), width 0.45s var(--ease-out); pointer-events: none; }
+.dark .nav-pill { background: rgb(255 255 255 / 0.08); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1); }
+
+/* Skip link: hidden until a keyboard user tabs to it. */
+.skip-link { position: fixed; left: 16px; top: 12px; z-index: 1000; padding: 10px 16px; border-radius: 999px; background: var(--color-ink); color: var(--color-paper); font-weight: 500; text-decoration: none; transform: translateY(-160%); transition: transform var(--dur-short) var(--ease-out); }
+.skip-link:focus-visible { transform: none; outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+/* Theme switch: the new theme is revealed by a circle (animated from script); no cross-fade. */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { z-index: 2; }
+
+/* Popups ease in and out (native <dialog>; browsers without @starting-style just open instantly). */
+@media (prefers-reduced-motion: no-preference) {
+  .dialog { opacity: 0; transform: translateY(14px) scale(0.98); transition: opacity 0.22s var(--ease-out), transform 0.32s var(--ease-out), overlay 0.32s allow-discrete, display 0.32s allow-discrete; }
+  .dialog[open] { opacity: 1; transform: none; }
+  @starting-style { .dialog[open] { opacity: 0; transform: translateY(14px) scale(0.98); } }
+  .dialog::backdrop { background: transparent; transition: background-color 0.3s var(--ease-out), overlay 0.3s allow-discrete, display 0.3s allow-discrete; }
+  .dialog[open]::backdrop { background: var(--color-scrim); }
+  @starting-style { .dialog[open]::backdrop { background: transparent; } }
+}
+
+/* On phones the project details rise from the bottom like a sheet. */
+@media (max-width: 40rem) {
+  .dialog--sheet { width: 100% !important; max-width: 100% !important; max-height: 88svh !important; margin: auto 0 0 !important; border-radius: 20px 20px 0 0; border-bottom: 0; }
+  @media (prefers-reduced-motion: no-preference) {
+    .dialog--sheet { transform: translateY(100%); transition: opacity 0.2s var(--ease-out), transform 0.42s var(--ease-out), overlay 0.42s allow-discrete, display 0.42s allow-discrete; }
+    .dialog--sheet[open] { transform: none; }
+    @starting-style { .dialog--sheet[open] { transform: translateY(100%); } }
   }
 }
-@keyframes enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* Music player: a soft placeholder while Spotify loads, then the player fades in. */
+.player { position: relative; min-height: 380px; }
+.player-skeleton { position: absolute; inset: 0; display: grid; grid-template-columns: 120px 1fr; grid-template-rows: auto 1fr; gap: 20px; padding: 20px; background: var(--color-graphite); }
+.player-skeleton > * { border-radius: 10px; background: var(--color-graphite-2); }
+.player-skeleton .psk-art { width: 120px; height: 120px; }
+.player-skeleton .psk-title { align-self: center; height: 22px; width: 60%; }
+.player-skeleton .psk-rows { grid-column: 1 / -1; background: repeating-linear-gradient(to bottom, var(--color-graphite-2) 0 14px, transparent 14px 46px); border-radius: 6px; }
+@media (prefers-reduced-motion: no-preference) {
+  .player-skeleton > * { animation: shimmer 1.4s ease-in-out infinite; }
+  .player iframe { opacity: 0; transform: scale(0.99); transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out); }
+  .player iframe.is-loaded { opacity: 1; transform: none; }
+}
+@keyframes shimmer { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+/* Back to top: the ring fills as you read down the page. */
+.top-ring { position: absolute; inset: -3px; pointer-events: none; transform: rotate(-90deg); }
+.top-ring circle { fill: none; stroke-width: 2; }
+.top-ring .track { stroke: var(--color-rule); }
+.top-ring .fill { stroke: var(--color-signal); stroke-linecap: round; transition: stroke-dashoffset 0.15s linear; }
+
+/* Logos tilt a little on hover (unlayered so it wins over the reveal's settled state). */
+@media (hover: hover) {
+  a.logo-tile:hover, li:hover > div > .logo-tile { transform: rotate(-4deg) scale(1.05); box-shadow: var(--shadow-lift); }
+}
+
+/* Dark mode: photo prints and logo tiles shouldn't be the brightest things on the page. */
+.dark .polaroid-img img, .dark .artist-photo img { filter: brightness(0.92); }
+.dark .logo-tile { background: #e9e6df; border-color: transparent; }
+.dark .logo-tile--fill { background: transparent; }
+
+/* The sketch waits until it's on screen to draw itself. */
+@media (prefers-reduced-motion: no-preference) {
+  .motion-ready .reveal:not(.is-in) .sketch * { animation-play-state: paused; }
+}
+
+/* Phones: artists become a swipeable row of chips above the player. */
+@media (max-width: 39.99rem) {
+  .artist-grid { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(var(--gutter) * -1); padding: 2px var(--gutter) 6px; }
+  .artist-grid::-webkit-scrollbar { display: none; }
+  .artist-grid > li { flex: none; scroll-snap-align: start; }
+  .artist { width: auto; padding: 6px 14px 6px 6px; border-radius: 999px; }
+  .artist .text-xs { display: none; }
+  .artist-photo { width: 40px; height: 40px; }
+}
+
+/* About: a peek at the photos and the playlist. */
+.peek-thumb { position: relative; display: block; aspect-ratio: 1; overflow: hidden; border-radius: 6px; border: 3px solid var(--color-print); box-shadow: var(--shadow-card), 0 6px 14px -8px rgb(28 27 25 / 0.4); transform: rotate(var(--tilt, 0deg)); transition: transform var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out); }
+.peek-thumb img { object-fit: cover; }
+.peek-thumb:hover, .peek-thumb:focus-visible { transform: rotate(0deg) scale(1.08); box-shadow: var(--shadow-lift); z-index: 1; }
+.peek-thumb:focus-visible, .peek-artists:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+.peek-artists { display: inline-flex; align-items: center; padding-left: 10px; min-height: 44px; border-radius: 999px; }
+.peek-artist { position: relative; width: 36px; height: 36px; margin-left: -10px; overflow: hidden; border-radius: 999px; border: 2px solid var(--color-paper); background: var(--color-paper-3); transition: transform var(--dur-short) var(--ease-out); }
+.peek-artist img { object-fit: cover; }
+.peek-artists:hover .peek-artist { transform: translateX(calc(var(--n, 0) * 1px)); }
+.peek-artists:hover .peek-artist:nth-child(n) { margin-left: -6px; }
+.dark .peek-thumb img, .dark .peek-artist img { filter: brightness(0.92); }
+
+/* Project cards: a live drawing across the top, like the featured card's. */
+.project-visual { position: relative; border-bottom: 1px solid var(--color-rule); background: var(--color-paper-2); transition: background-color var(--dur-short); }
+.card--lift:hover .project-visual { background: var(--color-signal-wash); }

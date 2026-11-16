@@ -24,28 +24,28 @@ function generateResponse(query: string): { text: string; citation?: string } {
 
   if (q.includes("rag") || q.includes("faiss") || q.includes("knowledge") || q.includes("vector")) {
     return {
-      text: `Sathwik built the **AI Knowledge Assistant** featuring Hybrid RAG (Dense FAISS vector search + Sparse BM25 keyword matching) with Reciprocal Rank Fusion (RRF). He also developed a **Support Ticket AI Assistant** integrated into Salesforce Chatter feeds with sub-250ms retrieval latency across 50,000+ document vectors.`,
+      text: `Sathwik built the **AI Knowledge Assistant** featuring Hybrid RAG (Dense FAISS vector search + Sparse BM25 keyword matching) and context-aware generation for small documents, plus a reflection agent that checks every answer against its sources. At Primesoft he also built a **Support Ticket AI Assistant** integrated into Salesforce Chatter feeds that finds similar past tickets with sub-second semantic search.`,
       citation: "#projects",
     };
   }
 
   if (q.includes("agent") || q.includes("email") || q.includes("orchestrat") || q.includes("react")) {
     return {
-      text: `Sathwik engineered an autonomous **AI Email Orchestration System** utilizing a Multi-Agent ReAct (Reason + Act) workflow. The system coordinates specialized Planning, Generation, and Reflection agents to autonomously draft and audit personalized emails with 98.5% microservice uptime.`,
+      text: `Sathwik built an **AI Email Orchestration System** at Primesoft: planning, generation and reflection agents in a ReAct-style loop that turns a one-line request into a reviewed draft in under 5 seconds.`,
       citation: "#projects",
     };
   }
 
   if (q.includes("backend") || q.includes("python") || q.includes("fastapi") || q.includes("api")) {
     return {
-      text: `Sathwik is skilled in Python, FastAPI, Flask, AsyncIO, and REST API design. At Primesoft Solutions, he designs microservices handling authentication (JWT/OAuth), async background pipelines, and enterprise cloud integrations on AWS and Azure.`,
+      text: `Sathwik is skilled in Python, FastAPI, Flask, SQLAlchemy and REST API design. At Primesoft Solutions he builds Python backends and APIs with JWT/OAuth authentication, PostgreSQL and Redis, deployed with Docker on Azure and AWS.`,
       citation: "#skills",
     };
   }
 
-  if (q.includes("salesforce") || q.includes("cloud") || q.includes("azure") || q.includes("aws") || q.includes("cve")) {
+  if (q.includes("salesforce") || q.includes("cloud") || q.includes("azure") || q.includes("aws")) {
     return {
-      text: `Sathwik has hands-on cloud experience deploying serverless microservices on AWS Lambda and Azure App Services. On the **SmartFit Enterprise Platform**, he resolved Twilio SMS OTP delivery issues and remediated 14+ container CVE vulnerabilities.`,
+      text: `Sathwik has hands-on cloud experience: serverless Python APIs on AWS Lambda, API Gateway and DynamoDB during his internship at Venago, and Docker-based services on Azure at Primesoft. His **Support Ticket AI Assistant** pulls tickets, comments and Chatter feeds through the Salesforce APIs.`,
       citation: "#experience",
     };
   }
@@ -65,7 +65,7 @@ export function PortfolioChatbot() {
     {
       id: "init-1",
       sender: "ai",
-      text: `Hi! I'm Sathwik's AI Assistant. Ask me anything about his GenAI projects, Python backend work, or experience!`,
+      text: `Hi! I answer common questions about Sathwik's projects, backend work and experience from what's on this page. Pick a question or type your own.`,
       timestamp: "12:00 PM",
     },
   ]);
@@ -162,7 +162,7 @@ export function PortfolioChatbot() {
                 <Bot size={16} aria-hidden="true" className="shrink-0 text-ink-2" />
                 <div className="min-w-0">
                   <h3 className="text-[length:var(--text-md)] font-display font-medium text-ink">
-                    Sathwik AI Assistant
+                    Quick answers about Sathwik
                   </h3>
                   <p className="label text-xs">Answers drawn from this portfolio</p>
                 </div>
