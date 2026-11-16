@@ -1,28 +1,9 @@
-"use client";
-
-import { Fragment } from "react";
+import Image from "next/image";
+import { MetricLine } from "@/components/metric-line";
 import { EXPERIENCE_DATA, PROJECTS_DATA } from "@/data/portfolio-data";
 
-/* Figures inside a metric sentence (45%, 10,000+, <120ms) are machine values: set them in mono, keep the sentence exactly. */
-const FIGURE = /(<?\d[\d,.]*(?:\+|%|ms|x)?)/g;
-function MetricLine({ text }: { text: string }) {
-  const parts = text.split(FIGURE);
-  return (
-    <>
-      {parts.map((part, i) =>
-        i % 2 === 1 ? (
-          <span key={i} className="font-mono font-medium text-signal">
-            {part}
-          </span>
-        ) : (
-          <Fragment key={i}>{part}</Fragment>
-        )
-      )}
-    </>
-  );
-}
 
-/* "SmartFit Enterprise Platform" and "SmartFit – Enterprise Platform" name the same work. */
+/* Match an experience entry to its project card even if punctuation differs. */
 function normalizeName(name: string) {
   return name
     .toLowerCase()
@@ -30,13 +11,13 @@ function normalizeName(name: string) {
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 }
-const PROJECT_NAMES = new Set(PROJECTS_DATA.map((p) => normalizeName(p.title)));
+const PROJECT_IDS = new Map(PROJECTS_DATA.map((p) => [normalizeName(p.title), p.id]));
 
 export function Experience() {
   return (
     <section id="experience" aria-labelledby="experience-title" className="section">
       <div className="wrap">
-        <div className="section-head">
+        <div className="section-head reveal">
           <span className="section-mark">03 Experience</span>
           <h2 id="experience-title" className="kicker-title">Where I&apos;ve worked</h2>
         </div>
@@ -45,15 +26,22 @@ export function Experience() {
           {EXPERIENCE_DATA.map((exp) => (
             <li
               key={exp.id}
-              className="grid gap-x-[var(--gap-columns)] gap-y-6 border-t border-rule py-10 lg:grid-cols-12"
+              className="reveal grid gap-x-[var(--gap-columns)] gap-y-6 border-t border-rule py-10 lg:grid-cols-12"
             >
               {/* The ruler: company, role, dates, place */}
               <div className="lg:col-span-4">
-                <div className="relative grid gap-1 border-l border-rule-2 pl-4 lg:sticky lg:top-24">
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-2.5 -left-px h-px w-3 bg-ink-3"
-                  />
+                <div className="ruler relative grid gap-1 pl-4 lg:sticky lg:top-24">
+                  {exp.logo && (
+                    <a
+                      href={exp.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`logo-tile mb-3 ${exp.logoFill ? "logo-tile--fill" : ""}`}
+                      aria-label={`${exp.company} website (opens in a new tab)`}
+                    >
+                      <Image src={exp.logo} alt="" width={exp.logoSize?.[0] ?? 56} height={exp.logoSize?.[1] ?? 56} sizes="112px" />
+                    </a>
+                  )}
                   <p className="font-display text-[length:var(--text-lg)] font-medium tracking-[var(--tracking-display)] text-ink">
                     {exp.company}
                   </p>
@@ -67,7 +55,7 @@ export function Experience() {
               {/* The work */}
               <ul className="rows lg:col-span-8">
                 {exp.projects.map((project) => {
-                  const hasProject = PROJECT_NAMES.has(normalizeName(project.name));
+                  const projectId = PROJECT_IDS.get(normalizeName(project.name));
 
                   return (
                     <li key={project.name} className="grid gap-4 py-6 first:pt-0">
@@ -86,7 +74,7 @@ export function Experience() {
                         </ul>
                       )}
 
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="hidden flex-wrap gap-1.5 sm:flex">
                         {project.technologies.map((tech) => (
                           <span key={tech} className="tag">
                             {tech}
@@ -107,9 +95,9 @@ export function Experience() {
                             </ul>
                           </details>
                         )}
-                        {hasProject && (
+                        {projectId && (
                           <a
-                            href="#projects"
+                            href={`#${projectId}`}
                             className="link inline-flex min-h-10 items-center text-sm"
                           >
                             See the project

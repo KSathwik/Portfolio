@@ -4,7 +4,7 @@ export function Skills() {
   return (
     <section id="skills" aria-labelledby="skills-title" className="section section--tint">
       <div className="wrap">
-        <div className="section-head">
+        <div className="section-head reveal">
           <span className="section-mark">04 Skills</span>
           <h2 id="skills-title" className="kicker-title">My toolkit</h2>
           <p>The languages, frameworks and platforms I reach for day to day.</p>
@@ -19,9 +19,9 @@ export function Skills() {
               <h3 className="text-[length:var(--text-lg)] font-medium text-ink">
                 {category.title}
               </h3>
-              <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
-                {category.skills.map((skill) => (
-                  <li key={skill} className="tag">
+              <ul className="stagger m-0 flex list-none flex-wrap gap-1.5 p-0">
+                {category.skills.map((skill, i) => (
+                  <li key={skill} className="tag" style={{ "--i": i } as React.CSSProperties}>
                     {skill}
                   </li>
                 ))}

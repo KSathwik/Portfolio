@@ -5,13 +5,14 @@ const sectionLinks = [
   { label: "Projects", href: "#projects" },
   { label: "Experience", href: "#experience" },
   { label: "Skills", href: "#skills" },
+  { label: "Lab", href: "#ai-lab" },
   { label: "Contact", href: "#contact" },
 ];
 
 const socialLinks = [
-  { label: "GitHub", href: "https://github.com/KSathwik", external: true },
-  { label: "LinkedIn", href: "https://linkedin.com/in/katkam-sathwik-5b5285202", external: true },
-  { label: "Email", href: "mailto:sathwikkatkam@gmail.com", external: false },
+  { label: "GitHub", href: PERSONAL_INFO.github, external: true },
+  { label: "LinkedIn", href: PERSONAL_INFO.linkedin, external: true },
+  { label: "Email", href: `mailto:${PERSONAL_INFO.email}`, external: false },
 ];
 
 export function Footer() {
@@ -22,8 +23,8 @@ export function Footer() {
           <span className="font-display text-lg font-medium tracking-[var(--tracking-display)] text-ink">
             {PERSONAL_INFO.name}
           </span>
-          <p className="label">
-            &copy; {new Date().getFullYear()} Sathwik Katkam
+          <p className="text-sm text-ink-2">
+            &copy; {new Date().getFullYear()} Sathwik Katkam · Designed and developed by me in Hyderabad, India
           </p>
         </div>
 
@@ -32,7 +33,7 @@ export function Footer() {
             <ul className="m-0 flex list-none flex-wrap gap-x-5 gap-y-2 p-0 text-sm">
               {sectionLinks.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href} className="link text-ink-2">
+                  <a href={link.href} className="link inline-flex min-h-11 items-center text-ink-2">
                     {link.label}
                   </a>
                 </li>
@@ -44,7 +45,7 @@ export function Footer() {
               <li key={link.label}>
                 <a
                   href={link.href}
-                  className="link text-ink-2"
+                  className="link inline-flex min-h-11 items-center text-ink-2"
                   {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                 >
                   {link.label}

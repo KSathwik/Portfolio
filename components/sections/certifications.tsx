@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { CircleCheck, Clock } from "lucide-react";
 import { CERTIFICATIONS_DATA } from "@/data/portfolio-data";
 
@@ -8,11 +9,20 @@ export function Certifications() {
 
       <ul className="rows m-0 list-none border-y border-rule p-0">
         {CERTIFICATIONS_DATA.map((cert) => (
-          <li key={cert.title} className="flex flex-col gap-2 py-5">
-            <h4 className="font-display text-[length:var(--text-md)] font-medium text-ink">
-              {cert.title}
-            </h4>
-            <p className="text-ink-2">{cert.issuer}</p>
+          <li key={cert.title} className="reveal flex flex-col gap-2 py-5">
+            <div className="flex items-start gap-4">
+              {cert.logo && (
+                <span className="logo-tile shrink-0">
+                  <Image src={cert.logo} alt="" width={cert.logoSize?.[0] ?? 56} height={cert.logoSize?.[1] ?? 56} sizes="112px" />
+                </span>
+              )}
+              <div className="grid min-w-0 gap-1">
+                <h4 className="font-display text-[length:var(--text-md)] font-medium text-ink">
+                  {cert.title}
+                </h4>
+                <p className="text-ink-2">{cert.issuer}</p>
+              </div>
+            </div>
             <p className="label flex items-center gap-1.5">
               {cert.inProgress ? (
                 <Clock size={14} aria-hidden="true" />

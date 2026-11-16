@@ -20,7 +20,7 @@ const SPLIT_START = 0.3;
 const SPLIT_END = 0.72;
 const SPREAD = 0.2;
 
-function hash(x: number, y: number) {
+export function hash(x: number, y: number) {
   const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
   return s - Math.floor(s);
 }
@@ -29,7 +29,7 @@ function smooth(t: number) {
   return t * t * (3 - 2 * t);
 }
 
-function noise(x: number, y: number) {
+export function noise(x: number, y: number) {
   const xi = Math.floor(x);
   const yi = Math.floor(y);
   const xf = smooth(x - xi);
@@ -58,6 +58,8 @@ function readPalette(): Palette {
     font: v("--font-outlier") || "ui-monospace, monospace",
   };
 }
+
+export type Density = (u: number, v: number, cols: number, rows: number, t: number) => number;
 
 function density(u: number, v: number, cols: number, rows: number, t: number) {
   // A faint ground of texture everywhere.
@@ -91,16 +93,43 @@ function density(u: number, v: number, cols: number, rows: number, t: number) {
   return d;
 }
 
-export function RetrievalField({
-  className = "h-[340px] sm:h-[420px] lg:h-[min(68vh,600px)]",
+export type FieldLabelSpec = { text: string; style: React.CSSProperties };
+
+/*
+ * A live ASCII drawing. `density` maps each cell (u, v in 0..1, time t in seconds) to a
+ * brightness; everything else (sizing, palette, theme changes, pausing off screen,
+ * reduced motion, the pointer lens) is shared by every field on the site.
+ */
+export function AsciiField({
+  density: densityFn,
+  labels = [],
+  ariaLabel,
+  className = "",
   bare = false,
+  cellW = CELL_W,
+  cellH = CELL_H,
+  fontSize = 12,
+  gain = 1,
 }: {
+  density: Density;
+  labels?: FieldLabelSpec[];
+  ariaLabel?: string;
   className?: string;
   /** Decorative mode: no labels, no pointer lens, hidden from assistive tech. */
   bare?: boolean;
+  cellW?: number;
+  cellH?: number;
+  fontSize?: number;
+  /** Brightness multiplier, for small fields that need to read at a glance. */
+  gain?: number;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const densityRef = useRef(densityFn);
+
+  useEffect(() => {
+    densityRef.current = densityFn;
+  }, [densityFn]);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -127,21 +156,22 @@ export function RetrievalField({
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      cols = Math.floor(width / CELL_W);
-      rows = Math.floor(height / CELL_H);
+      cols = Math.floor(width / cellW);
+      rows = Math.floor(height / cellH);
       draw();
     };
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.font = `400 12px ${palette.font}`;
+      ctx.font = `400 ${fontSize}px ${palette.font}`;
       ctx.textBaseline = "top";
+      const fn = densityRef.current;
       let current = "";
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
           const u = x / cols;
           const v = y / rows;
-          let d = density(u, v, cols, rows, t);
+          let d = fn(u, v, cols, rows, t) * gain;
           const px = x - pointer.x;
           const py = (y - pointer.y) * 2;
           d += 0.45 * Math.exp(-(px * px + py * py) / 60);
@@ -155,7 +185,7 @@ export function RetrievalField({
             ctx.fillStyle = fill;
             current = fill;
           }
-          ctx.fillText(glyph, x * CELL_W, y * CELL_H + 1);
+          ctx.fillText(glyph, x * cellW, y * cellH + 1);
         }
       }
     };
@@ -186,8 +216,8 @@ export function RetrievalField({
 
     const onPointer = (e: PointerEvent) => {
       const r = wrap.getBoundingClientRect();
-      pointer.x = (e.clientX - r.left) / CELL_W;
-      pointer.y = (e.clientY - r.top) / CELL_H;
+      pointer.x = (e.clientX - r.left) / cellW;
+      pointer.y = (e.clientY - r.top) / cellH;
       if (reduce.matches) draw();
     };
     const onLeave = () => {
@@ -231,18 +261,12 @@ export function RetrievalField({
       wrap.removeEventListener("pointermove", onPointer);
       wrap.removeEventListener("pointerleave", onLeave);
     };
-  }, [bare]);
+  }, [bare, cellW, cellH, fontSize, gain]);
 
   return (
     <figure
       className={`relative m-0 overflow-hidden ${bare ? "pointer-events-none" : ""} ${className}`}
-      {...(bare
-        ? { "aria-hidden": true }
-        : {
-            role: "img",
-            "aria-label":
-              "Hybrid retrieval: raw document chunks split into a dense FAISS search and a sparse BM25 search, which Reciprocal Rank Fusion joins into one ranked answer.",
-          })}
+      {...(bare || !ariaLabel ? { "aria-hidden": true } : { role: "img", "aria-label": ariaLabel })}
     >
       <div
         ref={wrapRef}
@@ -251,16 +275,40 @@ export function RetrievalField({
       >
         <canvas ref={canvasRef} className="absolute inset-0" />
       </div>
-      {!bare && (
-        <>
-          <FieldLabel style={{ left: "2%", top: "8%" }}>Raw chunks</FieldLabel>
-          <FieldLabel style={{ left: "40%", top: "17%" }}>Dense search, FAISS</FieldLabel>
-          <FieldLabel style={{ left: "40%", top: "78%" }}>Sparse search, BM25</FieldLabel>
-          <FieldLabel style={{ left: "70%", top: "57%" }}>Fused by RRF</FieldLabel>
-          <FieldLabel style={{ right: "0%", top: "40%" }}>Ranked context</FieldLabel>
-        </>
-      )}
+      {!bare &&
+        labels.map((l) => (
+          <FieldLabel key={l.text} style={l.style}>
+            {l.text}
+          </FieldLabel>
+        ))}
     </figure>
+  );
+}
+
+const RETRIEVAL_LABELS: FieldLabelSpec[] = [
+  { text: "Raw chunks", style: { left: "2%", top: "8%" } },
+  { text: "Dense search, FAISS", style: { left: "40%", top: "17%" } },
+  { text: "Sparse search, BM25", style: { left: "40%", top: "78%" } },
+  { text: "Fused by RRF", style: { left: "70%", top: "57%" } },
+  { text: "Ranked context", style: { right: "0%", top: "40%" } },
+];
+
+/* The AI Knowledge Assistant's hybrid retrieval, as used on the featured project. */
+export function RetrievalField({
+  className = "h-[340px] sm:h-[420px] lg:h-[min(68vh,600px)]",
+  bare = false,
+}: {
+  className?: string;
+  bare?: boolean;
+}) {
+  return (
+    <AsciiField
+      density={density}
+      labels={RETRIEVAL_LABELS}
+      bare={bare}
+      className={className}
+      ariaLabel="Hybrid retrieval: raw document chunks split into a dense FAISS search and a sparse BM25 search, which Reciprocal Rank Fusion joins into one ranked answer."
+    />
   );
 }
 

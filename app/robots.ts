@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://sathwikkatkam.dev/sitemap.xml",
+    sitemap: "https://portfolio-sathwik-k.vercel.app/sitemap.xml",
   };
 }

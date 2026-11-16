@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CircleCheck, CircleAlert, Copy, Check } from "lucide-react";
 import { PERSONAL_INFO } from "@/data/portfolio-data";
 import { ResumeDownload, ResumeView } from "@/components/resume-viewer";
+import { WhatsAppIcon } from "@/components/icons";
 
 const socialLinks = [
   {
@@ -15,6 +16,16 @@ const socialLinks = [
     href: PERSONAL_INFO.linkedin,
   },
 ];
+
+/* Show only the country code and last three digits until someone asks for the number. */
+function maskPhone(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  return `+${digits.slice(0, 2)} ••••• ••${digits.slice(-3)}`;
+}
+
+const whatsappUrl = `https://wa.me/${PERSONAL_INFO.whatsapp}?text=${encodeURIComponent(
+  "Hi Sathwik, I came across your portfolio and would like to connect."
+)}`;
 
 export function Contact() {
   const [formState, setFormState] = useState({
@@ -28,6 +39,7 @@ export function Contact() {
     type: "success" | "error" | null;
     message: string;
   }>({ type: null, message: "" });
+  const [showPhone, setShowPhone] = useState(false);
   const [copied, setCopied] = useState(false);
   /* Only the API's own validation errors mark fields invalid; network and server failures do not. */
   const [hasFieldErrors, setHasFieldErrors] = useState(false);
@@ -82,12 +94,12 @@ export function Contact() {
   return (
     <section id="contact" aria-labelledby="contact-title" className="section">
       <div className="wrap">
-        <div className="section-head">
-          <span className="section-mark">07 Contact</span>
-          <h2 id="contact-title" className="kicker-title">Let&apos;s build something</h2>
+        <div className="section-head reveal">
+          <span className="section-mark">08 Contact</span>
+          <h2 id="contact-title" className="kicker-title">Say hello</h2>
           <p>
-            I&apos;m open to software engineering, backend, and AI engineer roles. Feel free to
-            reach out to discuss technical collaborations or opportunities.
+            Hiring for a backend or AI engineer role, or just want to talk about RAG and agents? My
+            inbox is open, and I read every message myself.
           </p>
         </div>
 
@@ -124,12 +136,23 @@ export function Contact() {
             </div>
 
             <dl className="rows m-0 border-y border-rule">
-              <div className="grid grid-cols-[6rem_minmax(0,1fr)] gap-4 py-3">
+              <div className="grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-4 py-3">
                 <dt className="label">Phone</dt>
-                <dd className="m-0">
-                  <a href={`tel:${PERSONAL_INFO.phone.replace(/\s+/g, "")}`} className="link font-mono text-sm">
-                    {PERSONAL_INFO.phone}
-                  </a>
+                <dd className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1">
+                  {showPhone ? (
+                    <a href={`tel:${PERSONAL_INFO.phone.replace(/\s+/g, "")}`} className="link font-mono text-sm">
+                      {PERSONAL_INFO.phone}
+                    </a>
+                  ) : (
+                    <>
+                      <span className="font-mono text-sm text-ink-2" aria-hidden="true">
+                        {maskPhone(PERSONAL_INFO.phone)}
+                      </span>
+                      <button type="button" onClick={() => setShowPhone(true)} className="link inline-flex min-h-11 items-center text-sm">
+                        Show phone number
+                      </button>
+                    </>
+                  )}
                 </dd>
               </div>
               <div className="grid grid-cols-[6rem_minmax(0,1fr)] gap-4 py-3">
@@ -145,7 +168,7 @@ export function Contact() {
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="link"
+                      className="link inline-flex min-h-11 items-center"
                     >
                       {link.label}
                     </a>
@@ -155,6 +178,16 @@ export function Contact() {
             </dl>
 
             <div className="flex flex-wrap gap-3">
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn--whatsapp"
+              >
+                <WhatsAppIcon className="h-4 w-4" />
+                Message on WhatsApp
+                <span className="visually-hidden"> (opens in a new tab)</span>
+              </a>
               <ResumeDownload className="btn" />
               <ResumeView className="btn btn--ghost" />
             </div>

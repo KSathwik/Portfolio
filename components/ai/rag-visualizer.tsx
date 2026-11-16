@@ -11,12 +11,46 @@ interface VectorResult {
 }
 
 const SAMPLE_DOCS = [
-  "Sathwik built an AI Knowledge Assistant with FAISS and BM25 hybrid search.",
+  "AI Knowledge Assistant: hybrid RAG search in Python, FAISS for meaning plus BM25 for exact words.",
   "FastAPI microservice handling JWT authentication and high-concurrency requests.",
   "Multi-agent ReAct workflow for email drafting, planning, and self-reflection.",
-  "CVE vulnerability remediation on container images and Next.js applications.",
+  "LungAI: a DenseNet-121 chest X-ray classifier served through a FastAPI inference API.",
   "Salesforce Chatter API integration fetching support tickets and resolution logs.",
 ];
+
+/*
+ * A toy "embedding": each concept is a bag of related words. Dense similarity rewards
+ * a document that shares the query's concepts even with different words; sparse (BM25-ish)
+ * only rewards literal word overlap. Small, deterministic, and honest about what it is.
+ */
+const CONCEPTS: string[][] = [
+  ["rag", "retrieval", "search", "hybrid", "faiss", "bm25", "vector", "knowledge", "semantic"],
+  ["python", "fastapi", "flask", "microservice", "api"],
+  ["vision", "x-ray", "classifier", "densenet", "image", "medical"],
+  ["agent", "agents", "react", "reflection", "planning", "multi-agent", "workflow"],
+  ["email", "gmail", "drafting"],
+  ["salesforce", "ticket", "tickets", "support", "chatter"],
+  ["security", "cve", "vulnerability", "jwt", "auth", "authentication", "oauth"],
+];
+
+const words = (s: string) => s.toLowerCase().match(/[a-z0-9-]+/g) ?? [];
+
+function denseScore(query: string, doc: string) {
+  const q = new Set(words(query));
+  const d = new Set(words(doc));
+  const asked = CONCEPTS.filter((c) => c.some((w) => q.has(w)));
+  if (asked.length === 0) return 0.2;
+  const hits = asked.reduce((sum, c) => sum + c.filter((w) => d.has(w)).length / Math.min(c.length, 4), 0);
+  return Math.min(0.97, 0.2 + (0.75 * Math.min(hits, asked.length)) / asked.length);
+}
+
+function sparseScore(query: string, doc: string) {
+  const q = words(query).filter((w) => w.length > 2);
+  if (q.length === 0) return 0;
+  const d = new Set(words(doc));
+  const overlap = q.filter((w) => d.has(w)).length;
+  return Math.min(0.97, overlap / q.length);
+}
 
 const SEARCH_MODES = ["hybrid", "dense", "sparse"] as const;
 const MODE_LABELS: Record<(typeof SEARCH_MODES)[number], string> = {
@@ -32,31 +66,18 @@ export function RAGVisualizer() {
   const [chunkSize, setChunkSize] = useState(256);
 
   const results: VectorResult[] = SAMPLE_DOCS.map((text) => {
-    let denseScore = 0.45;
-    let sparseScore = 0.30;
-
-    const q = query.toLowerCase();
-    const t = text.toLowerCase();
-
-    if (q.includes("rag") && t.includes("rag")) denseScore += 0.42;
-    if (q.includes("python") && (t.includes("fastapi") || t.includes("python"))) denseScore += 0.35;
-    if (q.includes("agent") && t.includes("agent")) denseScore += 0.48;
-    if (q.includes("salesforce") && t.includes("salesforce")) denseScore += 0.40;
-
-    if (q.split(" ").some((w) => w.length > 3 && t.includes(w))) sparseScore += 0.38;
-
-    const hashOffset = (text.length % 5) * 0.01;
-    denseScore = Math.min(0.98, denseScore + hashOffset);
-    sparseScore = Math.min(0.95, sparseScore + hashOffset);
-    const fusedScore = Number(((denseScore * 0.6 + sparseScore * 0.4)).toFixed(3));
-
+    const dense = denseScore(query, text);
+    const sparse = sparseScore(query, text);
     return {
       text,
-      denseScore: Number(denseScore.toFixed(3)),
-      sparseScore: Number(sparseScore.toFixed(3)),
-      fusedScore,
+      denseScore: Number(dense.toFixed(3)),
+      sparseScore: Number(sparse.toFixed(3)),
+      fusedScore: Number((dense * 0.6 + sparse * 0.4).toFixed(3)),
     };
-  }).sort((a, b) => b.fusedScore - a.fusedScore);
+  });
+  const scoreOf = (r: VectorResult) =>
+    searchMode === "hybrid" ? r.fusedScore : searchMode === "dense" ? r.denseScore : r.sparseScore;
+  results.sort((a, b) => scoreOf(b) - scoreOf(a));
 
   const chunkIndex = Math.max(0, CHUNK_SIZES.indexOf(chunkSize));
 
@@ -65,7 +86,8 @@ export function RAGVisualizer() {
       <div className="grid gap-2">
         <h3>Hybrid RAG &amp; vector search simulator</h3>
         <p className="max-w-[60ch] text-ink-2">
-          Simulate dense FAISS vector retrieval combined with sparse BM25 through reciprocal rank fusion (RRF).
+          A small simulation: dense search matches meaning, sparse (BM25-style) matches exact words, and
+          hybrid blends the two. Try &ldquo;agent workflow&rdquo; or &ldquo;JWT security&rdquo;, then switch modes.
         </p>
       </div>
 
@@ -124,7 +146,7 @@ export function RAGVisualizer() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="code min-h-11 w-full bg-transparent text-graphite-ink placeholder:text-graphite-muted"
+              className="code min-h-11 w-full bg-transparent text-base sm:text-[length:inherit] text-graphite-ink placeholder:text-graphite-muted"
               placeholder="Search vector database..."
             />
           </div>
@@ -147,19 +169,14 @@ export function RAGVisualizer() {
 
           <ol>
             {results.map((item, idx) => {
-              const score =
-                searchMode === "hybrid"
-                  ? item.fusedScore
-                  : searchMode === "dense"
-                  ? item.denseScore
-                  : item.sparseScore;
+              const score = scoreOf(item);
 
               return (
                 <li
                   key={idx}
                   className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 border-b border-graphite-2 px-5 py-3 last:border-b-0 sm:px-6"
                 >
-                  <span className="code muted">#0{idx + 1}</span>
+                  <span className="code muted">#{String(idx + 1).padStart(2, "0")}</span>
                   <p className="text-sm leading-relaxed">{item.text}</p>
                   <div className="grid justify-items-end gap-1.5 pt-0.5">
                     <span className="code token">{(score * 100).toFixed(1)}%</span>
