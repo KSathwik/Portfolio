@@ -94,8 +94,8 @@ export function Projects() {
                 <Context project={featured} />
               </div>
               <div className="grid gap-3">
-                <h3 className="text-[length:var(--text-3xl)] leading-[1.05] font-medium">{featured.title}</h3>
-                <p className="text-ink-2">{featured.description}</p>
+                <h3 className="text-[length:var(--text-2xl)] leading-[1.15] font-medium sm:text-[length:var(--text-3xl)]">{featured.title}</h3>
+                <p className="text-[length:var(--text-md)] leading-[1.55] text-ink-2">{featured.description}</p>
               </div>
               {featured.metrics && (
                 <ul className="grid gap-2 border-y border-rule py-4 text-sm text-ink-2">
@@ -158,8 +158,8 @@ export function Projects() {
                   )}
                 </div>
                 <div className="grid gap-2">
-                  <h3 className="text-[length:var(--text-title)] leading-[1.15] font-medium">{project.title}</h3>
-                  <p className="text-sm text-ink-2">{project.description}</p>
+                  <h3 className="text-[length:var(--text-xl)] leading-[1.15] font-medium">{project.title}</h3>
+                  <p className="text-[length:var(--text-md)] leading-[1.55] text-ink-2">{project.description}</p>
                 </div>
                 {project.metrics?.[0] && (
                   <p className="border-l-2 border-clay pl-3 text-sm text-ink-2">
