@@ -3,69 +3,42 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bot, Send, X, ChevronDown } from "lucide-react";
+import { searchSite, type Hit } from "@/lib/site-search";
 
 interface Message {
   id: string;
   sender: "user" | "ai";
   text: string;
   timestamp: string;
-  citation?: string;
+  hits?: Hit[];
 }
 
 const PRESET_PROMPTS = [
-  "What GenAI experience does Sathwik have?",
-  "Tell me about his RAG & FAISS projects.",
-  "What backend frameworks does he specialize in?",
-  "Has Sathwik worked with Salesforce & Cloud?",
+  "How does the knowledge assistant search?",
+  "What did he build at Primesoft?",
+  "How accurate is LungAI?",
+  "What music does he listen to?",
 ];
 
-function generateResponse(query: string): { text: string; citation?: string } {
-  const q = query.toLowerCase();
-
-  if (q.includes("rag") || q.includes("faiss") || q.includes("knowledge") || q.includes("vector")) {
+function answer(query: string): Pick<Message, "text" | "hits"> {
+  const hits = searchSite(query);
+  if (hits.length === 0) {
     return {
-      text: `Sathwik built the **AI Knowledge Assistant** featuring Hybrid RAG (Dense FAISS vector search + Sparse BM25 keyword matching) and context-aware generation for small documents, plus a reflection agent that checks every answer against its sources. At Primesoft he also built a **Support Ticket AI Assistant** integrated into Salesforce Chatter feeds that finds similar past tickets with sub-second semantic search.`,
-      citation: "#projects",
+      text: "I couldn't find that on this site. Try asking about a project, his work at Primesoft or Venago, skills, education or music.",
     };
   }
-
-  if (q.includes("agent") || q.includes("email") || q.includes("orchestrat") || q.includes("react")) {
-    return {
-      text: `Sathwik built an **AI Email Orchestration System** at Primesoft: planning, generation and reflection agents in a ReAct-style loop that turns a one-line request into a reviewed draft in under 5 seconds.`,
-      citation: "#projects",
-    };
-  }
-
-  if (q.includes("backend") || q.includes("python") || q.includes("fastapi") || q.includes("api")) {
-    return {
-      text: `Sathwik is skilled in Python, FastAPI, Flask, SQLAlchemy and REST API design. At Primesoft Solutions he builds Python backends and APIs with JWT/OAuth authentication, PostgreSQL and Redis, deployed with Docker on Azure and AWS.`,
-      citation: "#skills",
-    };
-  }
-
-  if (q.includes("salesforce") || q.includes("cloud") || q.includes("azure") || q.includes("aws")) {
-    return {
-      text: `Sathwik has hands-on cloud experience: serverless Python APIs on AWS Lambda, API Gateway and DynamoDB during his internship at Venago, and Docker-based services on Azure at Primesoft. His **Support Ticket AI Assistant** pulls tickets, comments and Chatter feeds through the Salesforce APIs.`,
-      citation: "#experience",
-    };
-  }
-
-  return {
-    text: `Sathwik Katkam is an Associate Software Engineer specializing in Generative AI, RAG architectures, FastAPI microservices, and Multi-Agent AI workflows. He holds a B.Tech in CSE (Data Science) with an 8.33 CGPA and certifications in Agentic AI (DeepLearning.AI) and IBM GenAI Engineering.`,
-    citation: "#about",
-  };
+  return { text: hits.length > 1 ? "The closest passages on this site:" : "The closest passage on this site:", hits };
 }
 
 export function PortfolioChatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "init-1",
       sender: "ai",
-      text: `Hi! I answer common questions about Sathwik's projects, backend work and experience from what's on this page. Pick a question or type your own.`,
+      text: `Hi! Ask anything about Sathwik and I'll find the most relevant passages on this site. It's BM25 keyword search running in your browser, no AI model, so it quotes rather than writes.`,
       timestamp: "12:00 PM",
     },
   ]);
@@ -86,7 +59,7 @@ export function PortfolioChatbot() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isTyping]);
+  }, [messages]);
 
   const handleSend = (textToSend?: string) => {
     const text = textToSend || input;
@@ -105,20 +78,19 @@ export function PortfolioChatbot() {
 
     setMessages((prev) => [...prev, userMsg]);
     if (!textToSend) setInput("");
-    setIsTyping(true);
 
-    setTimeout(() => {
-      const response = generateResponse(text);
-      const aiMsg: Message = {
+    // Search is instant; no pretend "thinking" delay.
+    const response = answer(text);
+    setMessages((prev) => [
+      ...prev,
+      {
         id: aiMsgId,
         sender: "ai",
         text: response.text,
-        citation: response.citation,
+        hits: response.hits,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      };
-      setMessages((prev) => [...prev, aiMsg]);
-      setIsTyping(false);
-    }, 600);
+      },
+    ]);
   };
 
   return (
@@ -154,7 +126,7 @@ export function PortfolioChatbot() {
               isMinimized ? "h-auto" : "h-[min(560px,calc(100svh-96px))]"
             }`}
             role="dialog"
-            aria-label="AI Portfolio Assistant"
+            aria-label="Search this portfolio"
           >
             {/* Header */}
             <div className="flex items-center justify-between gap-3 border-b border-rule bg-paper-2 px-4 py-3">
@@ -164,7 +136,7 @@ export function PortfolioChatbot() {
                   <h3 className="text-[length:var(--text-md)] font-display font-medium text-ink">
                     Quick answers about Sathwik
                   </h3>
-                  <p className="label text-xs">Answers drawn from this portfolio</p>
+                  <p className="label text-xs">BM25 keyword search over this site · no AI model</p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
@@ -206,15 +178,18 @@ export function PortfolioChatbot() {
                           msg.sender === "user" ? "bg-paper-3" : "border border-rule bg-paper-2"
                         }`}
                       >
-                        <p dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />
-                        {msg.citation && (
-                          <a
-                            href={msg.citation}
-                            onClick={() => setIsOpen(false)}
-                            className="link mt-2 inline-block text-xs"
-                          >
-                            Jump to section
-                          </a>
+                        <p>{msg.text}</p>
+                        {msg.hits && (
+                          <ul className="mt-2 grid list-none gap-2.5 p-0">
+                            {msg.hits.map((h) => (
+                              <li key={h.source + h.text.slice(0, 24)} className="grid gap-1 border-l-2 border-signal pl-2.5">
+                                <span className="text-ink-2">{h.text}</span>
+                                <a href={h.href} onClick={() => setIsOpen(false)} className="link w-fit text-xs">
+                                  {h.source}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
                         )}
                       </div>
                       <span className="mt-1 px-1 font-mono text-[11px] text-ink-3">
@@ -223,7 +198,6 @@ export function PortfolioChatbot() {
                     </div>
                   ))}
 
-                  {isTyping && <p className="label">Writing…</p>}
                   <div ref={messagesEndRef} />
                 </div>
 
@@ -257,12 +231,12 @@ export function PortfolioChatbot() {
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Ask about Sathwik's experience..."
+                    placeholder="e.g. Has he used FastAPI?"
                     className="input min-h-10 flex-1 py-2 text-sm"
                   />
                   <button
                     type="submit"
-                    disabled={!input.trim() || isTyping}
+                    disabled={!input.trim()}
                     className="key key--primary key--icon shrink-0"
                     aria-label="Send message"
                   >

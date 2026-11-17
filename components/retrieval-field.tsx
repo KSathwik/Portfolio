@@ -5,8 +5,8 @@ import { useEffect, useRef } from "react";
 /*
  * The site's signature drawing: an ASCII field on an 8 by 16 cell, shaped by the work's own flow.
  * Here that flow is the AI Knowledge Assistant's hybrid retrieval: a cloud of raw chunks
- * on the left splits into a dense (FAISS) and a sparse (BM25) stream, which Reciprocal
- * Rank Fusion joins into one line on the right. 30 fps, a pointer lens, no animation
+ * on the left splits into a dense (FAISS) and a sparse (BM25) stream, which a weighted blend
+ * of their normalised scores joins into one line on the right. 30 fps, a pointer lens, no animation
  * frames at all while off screen, one still frame under reduced motion; a dot grid
  * stands in without script. `bare` drops the labels and the lens for decorative use.
  */
@@ -289,7 +289,7 @@ const RETRIEVAL_LABELS: FieldLabelSpec[] = [
   { text: "Raw chunks", style: { left: "2%", top: "8%" } },
   { text: "Dense search, FAISS", style: { left: "40%", top: "17%" } },
   { text: "Sparse search, BM25", style: { left: "40%", top: "78%" } },
-  { text: "Fused by RRF", style: { left: "70%", top: "57%" } },
+  { text: "Blended, 0.6 / 0.4", style: { left: "70%", top: "57%" } },
   { text: "Ranked context", style: { right: "0%", top: "40%" } },
 ];
 
@@ -307,7 +307,7 @@ export function RetrievalField({
       labels={RETRIEVAL_LABELS}
       bare={bare}
       className={className}
-      ariaLabel="Hybrid retrieval: raw document chunks split into a dense FAISS search and a sparse BM25 search, which Reciprocal Rank Fusion joins into one ranked answer."
+      ariaLabel="Hybrid retrieval: raw document chunks split into a dense FAISS search and a sparse BM25 search, whose normalised scores are blended, 60% dense and 40% BM25, into one ranked answer."
     />
   );
 }

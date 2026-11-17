@@ -148,12 +148,12 @@ function HorizontalSketch() {
             );
           })}
 
-          {/* Rank fusion: where the two searches meet */}
+          {/* The blend: where the two searches meet (0.6 dense + 0.4 BM25) */}
           <g style={{ "--d": "0.8s" } as React.CSSProperties}>
             <path d={roughCircle(774, 131, 30, 91)} className="sk-box" />
             <path d={roughCircle(774, 131, 30, 91)} className="sk-line" pathLength={1} />
             <text x="774" y="137" textAnchor="middle" className="sk-mono">
-              RRF
+              blend
             </text>
           </g>
 
@@ -201,7 +201,7 @@ function HorizontalSketch() {
             <path className="sk-line" pathLength={1} d="M868,64 C830,64 800,74 788,96" />
             <path className="sk-line" pathLength={1} d="M782,86 L788,97 L798,90" />
             <text x="876" y="70" className="sk-hand sk-note-text">
-              fuse the two rankings
+              blend the scores, 60 / 40
             </text>
           </g>
         </svg>
@@ -280,7 +280,7 @@ function VerticalSketch() {
         <path d={roughCircle(180, 522, 26, 91)} className="sk-box" />
         <path d={roughCircle(180, 522, 26, 91)} className="sk-line" pathLength={1} />
         <text x="180" y="528" textAnchor="middle" className="sk-mono">
-          RRF
+          blend
         </text>
       </g>
 
@@ -319,10 +319,10 @@ function VerticalSketch() {
           both, not either
         </text>
         <text x="20" y="516" className="sk-hand sk-note-text sk-note-sm">
-          fuse the
+          blend the
         </text>
         <text x="20" y="534" className="sk-hand sk-note-text sk-note-sm">
-          two rankings
+          scores, 60 / 40
         </text>
         <path className="sk-line" pathLength={1} d="M114,528 C128,530 140,528 150,524" />
         <path className="sk-line" pathLength={1} d="M143,519 L151,524 L143,530" />
