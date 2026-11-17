@@ -68,21 +68,21 @@ export function Contact() {
       if (response.ok && data.success) {
         setStatus({
           type: "success",
-          message: data.message || "Message sent successfully!",
+          message: data.message || "Sent. I'll reply soon.",
         });
         setFormState({ name: "", email: "", message: "", honeypot: "" });
       } else {
         setHasFieldErrors(response.status === 400 || response.status === 422);
         setStatus({
           type: "error",
-          message: data.message || "Failed to send message.",
+          message: data.message || "Couldn't send that. Check the fields and try again?",
         });
       }
     } catch (err) {
       console.error(err);
       setStatus({
         type: "error",
-        message: "An unexpected error occurred. Please try again later.",
+        message: "Couldn't send that. Email me directly instead?",
       });
     } finally {
       setIsSubmitting(false);
@@ -92,18 +92,18 @@ export function Contact() {
   const isInvalid = hasFieldErrors ? true : undefined;
 
   return (
-    <section id="contact" aria-labelledby="contact-title" className="section">
+    <section id="contact" aria-labelledby="contact-title" className="section section--tint">
       <div className="wrap">
         <div className="section-head reveal">
-          <span className="section-mark">08 Contact</span>
+          <span className="section-mark">08 Contact<span className="head-note" aria-hidden="true">write back?</span></span>
           <h2 id="contact-title" className="kicker-title">Say hello</h2>
           <p>
-            Hiring for a backend or AI engineer role, or just want to talk about RAG and agents? My
-            inbox is open, and I read every message myself.
+            Want to talk RAG, agents, or a film score you can&apos;t stop playing? My inbox is open, and
+            I read every message myself.
           </p>
         </div>
 
-        <div className="grid gap-x-[var(--gap-columns)] gap-y-12 lg:grid-cols-12">
+        <div className="reveal grid gap-x-[var(--gap-columns)] gap-y-12 lg:grid-cols-12">
           {/* Direct contact first */}
           <div className="flex flex-col gap-8 lg:col-span-5">
             <div className="flex flex-col gap-3">
@@ -120,8 +120,8 @@ export function Contact() {
               >
                 {copied ? (
                   <>
-                    <Check size={14} aria-hidden="true" className="text-success" />
-                    Copied
+                    <Check size={14} aria-hidden="true" className="pop-in text-success" />
+                    <span className="pop-in">Copied</span>
                   </>
                 ) : (
                   <>
@@ -298,7 +298,7 @@ export function Contact() {
                       ) : (
                         <CircleAlert size={16} aria-hidden="true" className="shrink-0" />
                       )}
-                      <span>{status.message}</span>
+                      <span key={status.message} className="pop-in">{status.message}</span>
                     </>
                   )}
                 </p>

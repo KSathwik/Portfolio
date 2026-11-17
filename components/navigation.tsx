@@ -8,6 +8,7 @@ import { ResumeDownload, ResumeView } from "@/components/resume-viewer";
 import { useTheme } from "next-themes";
 import { CommandPalette } from "@/components/command-palette";
 import { PERSONAL_INFO } from "@/data/portfolio-data";
+import { EASE_IN_OUT_CSS, THEME_WIPE_MS, UI_EXIT, UI_TRANSITION } from "@/lib/motion";
 
 const emptySubscribe = () => () => {};
 function useIsClient() {
@@ -26,16 +27,16 @@ const navItems = [
   { label: "Contact", href: "#contact" },
 ];
 
-/* Sections that light up a nav link while you're reading them. Skills sits under Experience,
- * Education and Off the clock under Lab, so the indicator never jumps back to nothing. */
+/* Sections that light up a nav link while you're reading them. Sections without a link of
+ * their own (Skills, Education, Off the clock) light up nothing rather than the wrong link. */
 const SECTION_TO_LINK: Record<string, string> = {
   about: "#about",
   projects: "#projects",
   experience: "#experience",
-  skills: "#experience",
+  skills: "",
   "ai-lab": "#ai-lab",
-  education: "#ai-lab",
-  "off-the-clock": "#ai-lab",
+  education: "",
+  "off-the-clock": "",
   contact: "#contact",
 };
 
@@ -44,7 +45,7 @@ export function Navigation() {
   const [isHidden, setIsHidden] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [active, setActive] = useState("#about");
-  const [indicator, setIndicator] = useState<{ left: number; width: number } | null>(null);
+  const [indicator, setIndicator] = useState<{ left: number; width: number; on: boolean } | null>(null);
   const linksRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme, setTheme } = useTheme();
   const mounted = useIsClient();
@@ -109,7 +110,10 @@ export function Navigation() {
   useLayoutEffect(() => {
     const measure = () => {
       const link = linksRef.current?.querySelector<HTMLAnchorElement>(`a[href="${active}"]`);
-      setIndicator(link ? { left: link.offsetLeft, width: link.offsetWidth } : null);
+      // With no link to mark, the pill fades out where it was instead of vanishing.
+      setIndicator((prev) =>
+        link ? { left: link.offsetLeft, width: link.offsetWidth, on: true } : prev ? { ...prev, on: false } : null
+      );
     };
     measure();
     // Web fonts can swap in after first paint and change link widths; measure again then.
@@ -145,7 +149,7 @@ export function Navigation() {
       .then(() => {
         document.documentElement.animate(
           { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
-          { duration: 520, easing: "cubic-bezier(0.65, 0, 0.35, 1)", pseudoElement: "::view-transition-new(root)" }
+          { duration: THEME_WIPE_MS, easing: EASE_IN_OUT_CSS, pseudoElement: "::view-transition-new(root)" }
         );
       })
       // A second click mid-animation skips the first transition; the theme still changes.
@@ -182,7 +186,7 @@ export function Navigation() {
             <span
               aria-hidden="true"
               className="nav-pill"
-              style={{ transform: `translateX(${indicator.left}px)`, width: indicator.width }}
+              style={{ transform: `translateX(${indicator.left}px)`, width: indicator.width, opacity: indicator.on ? 1 : 0 }}
             />
           )}
           {navItems.map((item) => (
@@ -225,7 +229,10 @@ export function Navigation() {
             aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={isMobileMenuOpen}
           >
-            {isMobileMenuOpen ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}
+            <span className="menu-icon" aria-hidden="true">
+              <Menu size={18} className={isMobileMenuOpen ? "is-off" : undefined} />
+              <X size={18} className={isMobileMenuOpen ? undefined : "is-off"} />
+            </span>
           </button>
         </div>
       </nav>
@@ -235,9 +242,8 @@ export function Navigation() {
         {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            animate={{ opacity: 1, y: 0, transition: UI_TRANSITION }}
+            exit={{ opacity: 0, y: -8, transition: UI_EXIT }}
             className="absolute inset-x-0 top-full border-b border-rule bg-paper lg:hidden"
           >
             <div className="wrap rows py-2">

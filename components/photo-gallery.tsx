@@ -4,6 +4,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 import { GALLERY_PHOTOS } from "@/data/portfolio-data";
+import { OPEN_PHOTO_EVENT } from "@/lib/motion";
 
 /*
  * Through my lens: photos I've taken, pinned up as prints on a wall (CSS columns keep each
@@ -22,6 +23,18 @@ export function PhotoGallery() {
     dialogRef.current?.showModal();
   };
   const close = () => dialogRef.current?.close();
+
+  /* About's thumbnails open a photo here without scrolling the page. */
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const i = (e as CustomEvent<number>).detail;
+      triggerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      setIndex(i);
+      dialogRef.current?.showModal();
+    };
+    window.addEventListener(OPEN_PHOTO_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_PHOTO_EVENT, onOpen);
+  }, []);
   const step = useCallback((delta: number) => setIndex((i) => (i === null ? i : (i + delta + count) % count)), [count]);
 
   useEffect(() => {

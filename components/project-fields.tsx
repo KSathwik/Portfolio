@@ -198,6 +198,7 @@ export function ProjectField({ id, className = "h-44" }: { id: string; className
       cellH={14}
       fontSize={12}
       gain={1.45}
+      fps={20}
     />
   );
 }

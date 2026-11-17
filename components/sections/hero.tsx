@@ -3,6 +3,7 @@ import { ArrowDown, Mail, MapPin } from "lucide-react";
 import { GitHubIcon, LinkedInIcon, WhatsAppIcon } from "@/components/icons";
 import { ResumeDownload, ResumeView } from "@/components/resume-viewer";
 import { SketchBanner } from "@/components/sketch-banner";
+import { PeekPhotos } from "@/components/peek-photos";
 import {
   PERSONAL_INFO,
   EXPERIENCE_DATA,
@@ -25,8 +26,8 @@ const interests = [
 
 const facts = [
   { value: "45%", label: "faster ticket resolution with the support assistant" },
-  { value: "<5 s", label: "for a reviewed AI email draft, down from minutes" },
-  { value: "0.955", label: "ROC-AUC on held-out X-rays (LungAI)" },
+  { value: "<5s", label: "to write and check an email draft, down from minutes" },
+  { value: "0.955", label: "how well LungAI tells six chest conditions apart (1.0 is perfect)" },
   { value: degree.score.replace("CGPA: ", ""), label: "CGPA, B.Tech CSE (Data Science)" },
 ];
 
@@ -165,8 +166,7 @@ export function Hero() {
                   <h3 className="text-[length:var(--text-lg)]">Where I&apos;m heading</h3>
                   <p className="text-ink-2">
                     I want to grow into an AI engineer who owns systems end to end, from retrieval and
-                    evaluation to the APIs, security and cloud they run on. I&apos;m open to software
-                    engineering, backend and AI engineer roles.
+                    evaluation to the APIs, security and cloud they run on.
                   </p>
                   <a href="#contact" className="link inline-flex min-h-11 w-fit items-center">
                     <Mail size={14} aria-hidden="true" className="mr-1.5 inline align-[-2px]" />
@@ -179,7 +179,7 @@ export function Hero() {
           <div className="contents lg:col-span-4 lg:col-start-9 lg:flex lg:min-w-0 lg:flex-col lg:gap-12">
             {/* The numbers, under their own heading */}
             <div className="reveal order-2 flex min-w-0 flex-col gap-4 lg:order-2">
-              <h3 className="text-[length:var(--text-lg)]">By the numbers</h3>
+              <h3 className="text-[length:var(--text-lg)]">A few numbers I&apos;m proud of</h3>
               <dl className="facts facts--grid min-w-0">
                 {facts.map((f) => (
                   <div key={f.label} className="fact">
@@ -207,33 +207,13 @@ export function Hero() {
                 {/* Off the clock, at a glance: a few of my photos and who's on my playlist */}
                 <div className="flex flex-col gap-4">
                   <div className="grid gap-1">
-                    <h3 className="text-[length:var(--text-lg)]">Off the clock</h3>
+                    <h3 className="text-[length:var(--text-lg)]">When I&apos;m not coding</h3>
                     <p className="text-ink-2">
                       Music on while I code, a good movie on weekends, and a camera whenever I travel.
                     </p>
                   </div>
 
-                  {GALLERY_PHOTOS.length > 0 && (
-                    <div className="grid gap-2">
-                      <ul className="m-0 grid list-none grid-cols-4 gap-2 p-0">
-                        {GALLERY_PHOTOS.slice(0, 4).map((p, i) => (
-                          <li key={p.src}>
-                            <a
-                              href="#through-my-lens"
-                              className="peek-thumb"
-                              style={{ "--tilt": `${[-3, 2, -1.5, 2.5][i]}deg` } as React.CSSProperties}
-                              aria-label={`${p.alt} (see all my photos)`}
-                            >
-                              <Image src={p.src} alt="" fill sizes="80px" />
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                      <a href="#through-my-lens" className="link inline-flex min-h-11 w-fit items-center text-sm">
-                        See all {GALLERY_PHOTOS.length} photos
-                      </a>
-                    </div>
-                  )}
+                  {GALLERY_PHOTOS.length > 0 && <PeekPhotos />}
 
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <a href="#off-the-clock" className="peek-artists" aria-label="See the artists on my playlist">

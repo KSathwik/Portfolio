@@ -89,7 +89,12 @@
 :root {
   color-scheme: light;
   --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px; --space-3xl: 96px; --space-4xl: 144px;
-  --dur-micro: 150ms; --dur-short: 220ms; --dur-long: 600ms;
+  /* Motion: micro for hover and press, short for small state changes, ui for dialogs and menus,
+     enter for things arriving on the page, draw for pen strokes. One stagger step, one rise, one lift. */
+  --dur-micro: 150ms; --dur-short: 220ms; --dur-ui: 320ms; --dur-enter: 640ms; --dur-draw: 900ms; --dur-long: var(--dur-enter);
+  --stagger: 60ms; --rise: 16px; --lift: -2px;
+  /* Space under a section's heading block. */
+  --head-gap: 56px;
   --container: 1200px; --gutter: 48px; --gap-columns: 32px; --section-gap-s: 112px; --section-gap: 136px; --section-gap-l: 168px;
   --z-base: 1; --z-raised: 10; --z-dropdown: 100; --z-sticky: 200; --z-sticky-nav: 300; --z-modal: 400; --z-toast: 500; --z-tooltip: 600;
   --cell-w: 8px; --cell-h: 16px; --cut: 8px; --cut-l: 16px;
@@ -99,8 +104,8 @@
 
 /* Tighter gutters and section spacing on smaller screens. These live here, unlayered,
  * so they override the :root values above (base.css sits in a lower-priority layer). */
-@media (max-width: 60rem) { :root { --gutter: 24px; --section-gap-s: 88px; --section-gap: 96px; --section-gap-l: 120px; } }
-@media (max-width: 40rem) { :root { --gutter: 16px; --section-gap-s: 56px; --section-gap: 72px; --section-gap-l: 96px; --gap-columns: 16px; } }
+@media (max-width: 60rem) { :root { --gutter: 24px; --section-gap-s: 88px; --section-gap: 96px; --section-gap-l: 120px; --head-gap: 48px; } }
+@media (max-width: 40rem) { :root { --gutter: 16px; --section-gap-s: 64px; --section-gap: 72px; --section-gap-l: 96px; --gap-columns: 16px; --head-gap: 36px; } }
 
 /* Dark: warm near-black, the teal lifted to mint, terracotta to apricot. */
 .dark {

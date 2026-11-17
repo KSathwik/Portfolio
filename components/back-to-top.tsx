@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
+import { scrollBehavior, UI_TRANSITION } from "@/lib/motion";
 
 const R = 22;
 const C = 2 * Math.PI * R;
@@ -30,7 +31,7 @@ export function BackToTop() {
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: scrollBehavior() });
   };
 
   return (
@@ -41,7 +42,7 @@ export function BackToTop() {
           initial={{ opacity: 0, y: 12, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 12, scale: 0.9 }}
-          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          transition={UI_TRANSITION}
           onClick={scrollToTop}
           className="btn btn--icon fixed bottom-4 left-4 z-[var(--z-sticky)] sm:bottom-6 sm:left-6"
           aria-label="Back to top"

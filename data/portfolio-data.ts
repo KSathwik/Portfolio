@@ -163,7 +163,7 @@ export const PROJECTS_DATA: Project[] = [
     ],
     metrics: [
       "77.4% test accuracy, macro ROC-AUC 0.955 on 2,350 held-out X-rays",
-      "94.8% of TB scans flagged abnormal on an unseen external cohort",
+      "External cohort (138 scans): 94.8% of TB scans flagged abnormal, but only 23.8% of normal scans called normal, and none labelled TB specifically",
       "0 patients or near-duplicate images shared across splits",
     ],
     architecture: [
