@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ExternalLink, Music2 } from "lucide-react";
 import { GALLERY_PHOTOS, MUSIC_ARTISTS } from "@/data/portfolio-data";
@@ -16,17 +16,31 @@ export function OffTheClock() {
   const [loadedId, setLoadedId] = useState<string | null>(null);
   const active = MUSIC_ARTISTS.find((a) => a.spotifyId === activeId) ?? MUSIC_ARTISTS[0];
 
-  /* If the iframe's load event was missed (it can fire before hydration), show it anyway. */
+  /*
+   * If the iframe's load event was missed (it can fire before hydration), show it anyway, but only
+   * once the player has been on screen a while: a lazy iframe doesn't start loading before that.
+   */
+  const playerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const t = window.setTimeout(() => setLoadedId(activeId), 3000);
-    return () => window.clearTimeout(t);
+    const el = playerRef.current;
+    if (!el) return;
+    let t = 0;
+    const io = new IntersectionObserver(([entry]) => {
+      window.clearTimeout(t);
+      if (entry.isIntersecting) t = window.setTimeout(() => setLoadedId(activeId), 4000);
+    });
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      window.clearTimeout(t);
+    };
   }, [activeId]);
 
   return (
     <section id="off-the-clock" aria-labelledby="off-the-clock-title" className="section">
       <div className="wrap">
         <div className="section-head reveal">
-          <span className="section-mark">07 Off the clock</span>
+          <span className="section-mark">07 Off the clock<span className="head-note" aria-hidden="true">headphones on</span></span>
           <h2 id="off-the-clock-title" className="kicker-title">What&apos;s playing while I code</h2>
           <p>
             Most of my debugging happens with headphones on, usually to film music. Pick an artist
@@ -71,7 +85,7 @@ export function OffTheClock() {
 
           {/* Player */}
           <div className="reveal flex min-w-0 flex-col gap-3 lg:col-span-7">
-            <div className="player" aria-busy={loadedId !== active.spotifyId}>
+            <div ref={playerRef} className="player" aria-busy={loadedId !== active.spotifyId}>
               {loadedId !== active.spotifyId && (
                 <div className="player-skeleton" aria-hidden="true">
                   <span className="psk-art" />
@@ -112,11 +126,11 @@ export function OffTheClock() {
 
         {/* Through my lens: shows up as soon as photos are added to GALLERY_PHOTOS */}
         {GALLERY_PHOTOS.length > 0 && (
-          <div id="through-my-lens" className="mt-[var(--space-3xl)] scroll-mt-24">
-            <div className="reveal mb-10 grid max-w-[46rem] gap-2">
+          <div id="through-my-lens" className="mt-12 scroll-mt-24 sm:mt-[var(--space-2xl)]">
+            <div className="reveal mb-8 grid max-w-[46rem] gap-2 sm:mb-10">
               <h3 className="text-[length:var(--text-2xl)] font-medium">Through my lens</h3>
               <p className="text-ink-2">
-                I take my phone camera everywhere: waterfalls, early beaches, festival nights. Tap
+                I take my phone camera everywhere: waterfalls, early beaches, festival nights. Open
                 any print to see it bigger.
               </p>
             </div>

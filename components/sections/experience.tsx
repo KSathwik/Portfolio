@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ChevronRight } from "lucide-react";
 import { MetricLine } from "@/components/metric-line";
 import { EXPERIENCE_DATA, PROJECTS_DATA } from "@/data/portfolio-data";
 
@@ -18,8 +19,9 @@ export function Experience() {
     <section id="experience" aria-labelledby="experience-title" className="section">
       <div className="wrap">
         <div className="section-head reveal">
-          <span className="section-mark">03 Experience</span>
+          <span className="section-mark">03 Experience<span className="head-note" aria-hidden="true">the day job</span></span>
           <h2 id="experience-title" className="kicker-title">Where I&apos;ve worked</h2>
+          <p>Where the projects above were built, and the internship that came before.</p>
         </div>
 
         <ol className="border-b border-rule">
@@ -84,8 +86,9 @@ export function Experience() {
 
                       <div className="flex flex-wrap items-start gap-x-6 gap-y-2">
                         {project.responsibilities.length > 0 && (
-                          <details className="group min-w-0 flex-1 basis-64">
+                          <details className="details-smooth group min-w-0 flex-1 basis-64">
                             <summary className="flex min-h-10 w-fit cursor-pointer items-center text-sm font-medium text-ink-2 transition-colors duration-[var(--dur-micro)] hover:text-ink">
+                              <ChevronRight size={14} aria-hidden="true" className="chev mr-1" />
                               Responsibilities ({project.responsibilities.length})
                             </summary>
                             <ul className="mt-1 grid list-disc gap-1 pl-5 text-sm text-ink-2 marker:text-ink-3">

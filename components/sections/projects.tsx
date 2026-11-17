@@ -63,9 +63,9 @@ export function Projects() {
   }, [selectedProject]);
 
   const handleClose = () => {
-    // Let the close transition play before the content goes away.
+    // Let the close transition play before the content goes away (the phone sheet takes longest).
     window.clearTimeout(clearTimer.current);
-    clearTimer.current = window.setTimeout(() => setSelectedProject((p) => (dialogRef.current?.open ? p : null)), 340);
+    clearTimer.current = window.setTimeout(() => setSelectedProject((p) => (dialogRef.current?.open ? p : null)), 440);
     const trigger = triggerRef.current;
     triggerRef.current = null;
     trigger?.focus();
@@ -75,11 +75,11 @@ export function Projects() {
     <section id="projects" aria-labelledby="projects-title" className="section section--tint">
       <div className="wrap">
         <div className="section-head reveal">
-          <span className="section-mark">02 Projects</span>
+          <span className="section-mark">02 Projects<span className="head-note" aria-hidden="true">start with the big one &darr;</span></span>
           <h2 id="projects-title" className="kicker-title">Things I&apos;ve built</h2>
           <p>
-            Production work and personal projects across retrieval, agents and enterprise
-            platforms. Open any project for its architecture and results.
+            Some of this runs in production, some I built to learn. Open any of them to see how it
+            works and what came out of it.
           </p>
         </div>
 
@@ -118,15 +118,15 @@ export function Projects() {
                   type="button"
                   className="btn"
                   onClick={() => openProject(featured)}
-                  aria-label={`Read the case study for ${featured.title}`}
+                  aria-label={`How ${featured.title} works`}
                 >
-                  Read the case study
+                  How it works
                   <ArrowUpRight size={16} aria-hidden="true" />
                 </button>
                 {featured.repoUrl && (
                   <a href={featured.repoUrl} target="_blank" rel="noopener noreferrer" className="btn btn--ghost">
                     <GitHubIcon className="h-4 w-4" />
-                    Source on GitHub
+                    View the code
                     <span className="visually-hidden"> (opens in a new tab)</span>
                   </a>
                 )}
@@ -136,8 +136,8 @@ export function Projects() {
         )}
 
         <ul className="m-0 grid list-none gap-6 p-0 md:grid-cols-2 lg:grid-cols-3">
-          {others.map((project) => (
-            <li key={project.id} id={project.id} className="reveal scroll-mt-24">
+          {others.map((project, i) => (
+            <li key={project.id} id={project.id} className="reveal scroll-mt-24" style={{ "--i": i } as React.CSSProperties}>
               <article className="card card--lift relative flex h-full flex-col gap-5 overflow-hidden p-6 sm:p-7">
                 {/* A small live drawing of how this project works */}
                 <div className="project-visual -mx-6 -mt-6 sm:-mx-7 sm:-mt-7">
@@ -178,9 +178,9 @@ export function Projects() {
                   type="button"
                   className="link inline-flex min-h-11 w-fit cursor-pointer items-center gap-1 text-sm font-medium after:absolute after:inset-0 after:rounded-[var(--radius-card)] after:content-[''] focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-solid focus-visible:after:outline-[color:var(--color-focus)]"
                   onClick={() => openProject(project)}
-                  aria-label={`View details for ${project.title}`}
+                  aria-label={`How ${project.title} works`}
                 >
-                  View details
+                  How it works
                   <ArrowUpRight size={14} aria-hidden="true" />
                 </button>
               </article>
@@ -288,7 +288,7 @@ export function Projects() {
               ) : (
                 <p className="inline-flex items-center gap-1.5 text-sm text-ink-3">
                   <Lock size={14} aria-hidden="true" />
-                  Company project, so the code is private. Happy to walk through it in an interview.
+                  Company work, so the code stays private, but I&apos;m happy to talk through how it works.
                 </p>
               )}
               <button type="button" onClick={closeDialog} className="btn btn--ghost">

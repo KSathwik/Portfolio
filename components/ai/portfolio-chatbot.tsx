@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bot, Send, X, ChevronDown } from "lucide-react";
 import { searchSite, type Hit } from "@/lib/site-search";
+import { scrollBehavior, UI_EXIT, UI_TRANSITION } from "@/lib/motion";
 
 interface Message {
   id: string;
@@ -15,9 +16,9 @@ interface Message {
 
 const PRESET_PROMPTS = [
   "How does the knowledge assistant search?",
-  "What did he build at Primesoft?",
+  "What did Sathwik build at Primesoft?",
   "How accurate is LungAI?",
-  "What music does he listen to?",
+  "What music does Sathwik listen to?",
 ];
 
 function answer(query: string): Pick<Message, "text" | "hits"> {
@@ -39,7 +40,7 @@ export function PortfolioChatbot() {
       id: "init-1",
       sender: "ai",
       text: `Hi! Ask anything about Sathwik and I'll find the most relevant passages on this site. It's BM25 keyword search running in your browser, no AI model, so it quotes rather than writes.`,
-      timestamp: "12:00 PM",
+      timestamp: "",
     },
   ]);
 
@@ -58,7 +59,7 @@ export function PortfolioChatbot() {
   }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: scrollBehavior(), block: "nearest" });
   }, [messages]);
 
   const handleSend = (textToSend?: string) => {
@@ -101,9 +102,8 @@ export function PortfolioChatbot() {
           <motion.button
             type="button"
             initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            animate={{ opacity: 1, y: 0, transition: UI_TRANSITION }}
+            exit={{ opacity: 0, y: 8, transition: UI_EXIT }}
             onClick={() => setIsOpen(true)}
             className="btn fixed right-4 bottom-4 z-[var(--z-sticky)] shadow-[var(--shadow-lift)] max-sm:w-11 max-sm:px-0 sm:right-6 sm:bottom-6"
             aria-haspopup="dialog"
@@ -118,10 +118,10 @@ export function PortfolioChatbot() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, scale: 0.94, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0, transition: UI_TRANSITION }}
+            exit={{ opacity: 0, scale: 0.96, y: 8, transition: UI_EXIT }}
+            style={{ transformOrigin: "bottom right" }}
             className={`cut fixed right-4 bottom-6 z-[var(--z-sticky)] flex w-[calc(100vw-32px)] flex-col overflow-hidden bg-paper sm:right-6 sm:w-[400px] ${
               isMinimized ? "h-auto" : "h-[min(560px,calc(100svh-96px))]"
             }`}
@@ -144,7 +144,7 @@ export function PortfolioChatbot() {
                   type="button"
                   onClick={() => setIsMinimized(!isMinimized)}
                   className="key key--icon"
-                  aria-label="Minimize Chat"
+                  aria-label="Minimise chat"
                   aria-expanded={!isMinimized}
                 >
                   <ChevronDown
@@ -157,7 +157,7 @@ export function PortfolioChatbot() {
                   type="button"
                   onClick={() => setIsOpen(false)}
                   className="key key--icon"
-                  aria-label="Close Chat"
+                  aria-label="Close chat"
                 >
                   <X size={16} aria-hidden="true" />
                 </button>
@@ -171,7 +171,7 @@ export function PortfolioChatbot() {
                   {messages.map((msg) => (
                     <div
                       key={msg.id}
-                      className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}
+                      className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"} ${msg.id === "init-1" ? "" : "pop-in"}`}
                     >
                       <div
                         className={`max-w-[85%] rounded-[var(--radius-input)] px-3 py-2.5 leading-relaxed text-ink ${
@@ -192,9 +192,9 @@ export function PortfolioChatbot() {
                           </ul>
                         )}
                       </div>
-                      <span className="mt-1 px-1 font-mono text-[11px] text-ink-3">
-                        {msg.timestamp}
-                      </span>
+                      {msg.timestamp && (
+                        <span className="mt-1 px-1 font-mono text-[11px] text-ink-3">{msg.timestamp}</span>
+                      )}
                     </div>
                   ))}
 
@@ -231,7 +231,7 @@ export function PortfolioChatbot() {
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="e.g. Has he used FastAPI?"
+                    placeholder="e.g. Has Sathwik used FastAPI?"
                     className="input min-h-10 flex-1 py-2 text-sm"
                   />
                   <button

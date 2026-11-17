@@ -110,6 +110,7 @@ export function AsciiField({
   cellH = CELL_H,
   fontSize = 12,
   gain = 1,
+  fps = FPS,
 }: {
   density: Density;
   labels?: FieldLabelSpec[];
@@ -122,6 +123,8 @@ export function AsciiField({
   fontSize?: number;
   /** Brightness multiplier, for small fields that need to read at a glance. */
   gain?: number;
+  /** Frames per second; small decorative fields can run slower. */
+  fps?: number;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -194,9 +197,11 @@ export function AsciiField({
       raf = 0;
       if (!visible || document.hidden) return;
       raf = requestAnimationFrame(loop);
-      if (now - last < 1000 / FPS) return;
+      if (now - last < 1000 / fps) return;
+      // Nothing to animate for while a dialog covers the page.
+      if (document.querySelector("dialog[open]")) return;
       last = now;
-      t += 1 / FPS;
+      t += 1 / fps;
       draw();
     };
 
@@ -261,7 +266,7 @@ export function AsciiField({
       wrap.removeEventListener("pointermove", onPointer);
       wrap.removeEventListener("pointerleave", onLeave);
     };
-  }, [bare, cellW, cellH, fontSize, gain]);
+  }, [bare, cellW, cellH, fontSize, gain, fps]);
 
   return (
     <figure

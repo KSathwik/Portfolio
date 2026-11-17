@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Search } from "lucide-react";
+import { motion } from "framer-motion";
+import { DUR, EASE_OUT } from "@/lib/motion";
 import { BM25 } from "@/lib/site-search";
 
 interface VectorResult {
@@ -130,7 +132,7 @@ export function RAGVisualizer() {
             disabled={searchMode !== "hybrid"}
             aria-valuetext={`${denseWeight.toFixed(1)} dense, ${(1 - denseWeight).toFixed(1)} BM25`}
             onChange={(e) => setDenseWeight(Number(e.target.value))}
-            className="h-11 w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 [accent-color:var(--color-signal)]"
+            className="h-11 w-full cursor-pointer transition-opacity duration-[var(--dur-short)] disabled:cursor-not-allowed disabled:opacity-50 [accent-color:var(--color-signal)]"
           />
         </div>
       </div>
@@ -174,8 +176,10 @@ export function RAGVisualizer() {
               const score = scoreOf(item);
 
               return (
-                <li
-                  key={idx}
+                <motion.li
+                  layout="position"
+                  transition={{ layout: { duration: DUR.ui, ease: EASE_OUT } }}
+                  key={item.text}
                   className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 border-b border-graphite-2 px-5 py-3 last:border-b-0 sm:px-6"
                 >
                   <span className="code muted">#{String(idx + 1).padStart(2, "0")}</span>
@@ -192,7 +196,7 @@ export function RAGVisualizer() {
                       />
                     </span>
                   </div>
-                </li>
+                </motion.li>
               );
             })}
           </ol>

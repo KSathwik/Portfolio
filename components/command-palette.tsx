@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Search, X, FolderGit2, Briefcase, Award, Code2 } from "lucide-react";
 import { PROJECTS_DATA, EXPERIENCE_DATA, SKILL_CATEGORIES, CERTIFICATIONS_DATA } from "@/data/portfolio-data";
+import { scrollBehavior } from "@/lib/motion";
 
 /*
  * Site search in a native modal <dialog>: showModal() makes the rest of the page inert, so Tab
@@ -76,7 +77,7 @@ export function CommandPalette() {
           id: `${e.id}-${proj.name}`,
           title: `${proj.name} (${e.company})`,
           type: "Experience",
-          subtitle: proj.description.slice(0, 60) + "...",
+          subtitle: proj.description.slice(0, 60) + "…",
           icon: Briefcase,
           href: `#experience`,
         }))
@@ -88,7 +89,7 @@ export function CommandPalette() {
     ).map((s) => ({
       id: s.title,
       title: s.title,
-      type: "Skill Category",
+      type: "Skills",
       subtitle: s.skills.join(", "),
       icon: Code2,
       href: `#skills`,
@@ -119,7 +120,7 @@ export function CommandPalette() {
 
   const handleSelect = (href: string) => {
     close();
-    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    document.querySelector(href)?.scrollIntoView({ behavior: scrollBehavior() });
   };
 
   return (
@@ -171,7 +172,7 @@ export function CommandPalette() {
         <div className="max-h-[min(380px,60svh)] overflow-y-auto py-2" aria-live="polite">
           {searchResults.length === 0 ? (
             <p className="px-4 py-12 text-center text-sm text-ink-3">
-              No results found for &quot;{query}&quot;
+              No results for &ldquo;{query}&rdquo;
             </p>
           ) : (
             groups.map((group) => (

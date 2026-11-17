@@ -31,10 +31,11 @@ export default function Home() {
         <section aria-labelledby="education-title" className="section section--tint">
           <div className="wrap">
             <div className="section-head reveal">
-              <span className="section-mark">06 Education</span>
-              <h2 id="education-title" className="kicker-title">Education and certifications</h2>
+              <span className="section-mark">06 Education<span className="head-note" aria-hidden="true">the paperwork</span></span>
+              <h2 id="education-title" className="kicker-title">Where I learned it</h2>
+              <p>A degree in data science, then two courses on generative and agentic AI.</p>
             </div>
-            <div className="grid gap-x-[var(--gap-columns)] gap-y-16 lg:grid-cols-2">
+            <div className="reveal grid gap-x-[var(--gap-columns)] gap-y-12 lg:grid-cols-2">
               <Education />
               <Certifications />
             </div>

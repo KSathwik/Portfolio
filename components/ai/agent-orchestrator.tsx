@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { DUR, EASE_OUT } from "@/lib/motion";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, CheckCircle2, RefreshCw } from "lucide-react";
 
@@ -45,6 +46,7 @@ export function AgentOrchestrator() {
   const [selectedAgent, setSelectedAgent] = useState<AgentNode>(AGENTS_WORKFLOW[0]);
   const [isRunningSim, setIsRunningSim] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  const [hasRun, setHasRun] = useState(false);
 
   const timers = useRef<number[]>([]);
   const clearTimers = () => {
@@ -67,6 +69,7 @@ export function AgentOrchestrator() {
         setActiveStep(2);
         setSelectedAgent(AGENTS_WORKFLOW[2]);
         setIsRunningSim(false);
+        setHasRun(true);
       }, 2000),
     );
   };
@@ -113,7 +116,7 @@ export function AgentOrchestrator() {
               <li key={agent.id} className="relative">
                 <span
                   aria-hidden="true"
-                  className={`absolute top-6 -left-px h-px w-3 ${isActive ? "bg-signal" : "bg-ink-3"}`}
+                  className={`absolute top-6 -left-px h-px w-3 transition-colors duration-[var(--dur-short)] ${isActive ? "bg-signal" : "bg-ink-3"}`}
                 />
                 <button
                   type="button"
@@ -132,8 +135,8 @@ export function AgentOrchestrator() {
                       </span>
                     ) : (
                       <span className="label flex items-center gap-1.5">
-                        <CheckCircle2 size={14} aria-hidden="true" className="text-success" />
-                        Ready
+                        <CheckCircle2 size={14} aria-hidden="true" className={`transition-colors duration-[var(--dur-short)] ${hasRun ? "text-success" : "text-ink-3"}`} />
+                        {hasRun ? "Done" : "Idle"}
                       </span>
                     )}
                   </span>
@@ -155,7 +158,7 @@ export function AgentOrchestrator() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: DUR.short, ease: EASE_OUT }}
               className="cut grid gap-5 p-5 sm:p-6"
             >
               <div className="grid gap-1 border-b border-rule pb-4">

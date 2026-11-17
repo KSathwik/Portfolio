@@ -24,7 +24,7 @@ export function Footer() {
             {PERSONAL_INFO.name}
           </span>
           <p className="text-sm text-ink-2">
-            &copy; {new Date().getFullYear()} Sathwik Katkam · Designed and developed by me in Hyderabad, India
+            &copy; {new Date().getFullYear()} · Drawn, written and built by me in Hyderabad
           </p>
         </div>
 
