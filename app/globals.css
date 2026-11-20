@@ -2,7 +2,6 @@
  * (Monsoon Ink, Night Shift, Saffron Grid). Tokens live in tokens.css, the base in base.css. */
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
 @import "./tokens.css";
 @import "./base.css" layer(base);
 

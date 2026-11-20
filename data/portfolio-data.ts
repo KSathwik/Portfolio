@@ -19,7 +19,6 @@ export const PERSONAL_INFO = {
   bio: "AI/ML-focused software engineer with hands-on experience in production RAG systems, backend microservices, and generative AI workflows. Experienced in Python, FastAPI, LangChain, FAISS, Next.js, and cloud deployments on AWS and Azure.",
   location: "Hyderabad, India",
   email: "sathwikkatkam@gmail.com",
-  phone: "+91 6304651393",
   /** WhatsApp number in international format, digits only. */
   whatsapp: "916304651393",
   github: "https://github.com/KSathwik",
