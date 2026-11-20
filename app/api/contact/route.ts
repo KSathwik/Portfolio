@@ -1,48 +1,102 @@
 import { NextResponse } from "next/server";
 
+/*
+ * The contact form's only server endpoint. It relays a message to my inbox through FormSubmit,
+ * so the checks here stop it being used to spam me or anyone else:
+ *  - same-site only: the browser's Origin must match this site's host (blocks other sites and
+ *    most scripts);
+ *  - JSON only, small bodies only, and length limits on every field;
+ *  - a per-visitor rate limit (best effort: it lives in this server instance's memory);
+ *  - no line breaks or control characters in values that end up in email headers.
+ */
+
+const LIMITS = { body: 10_000, name: 100, email: 254, message: 5_000 } as const;
+const RATE = { max: 5, windowMs: 10 * 60 * 1000 } as const;
+
+const recent = new Map<string, number[]>();
+
+function rateLimited(key: string) {
+  const now = Date.now();
+  const hits = (recent.get(key) ?? []).filter((t) => now - t < RATE.windowMs);
+  hits.push(now);
+  recent.set(key, hits);
+  // Keep the map small: forget visitors with no recent requests.
+  if (recent.size > 1_000) {
+    for (const [k, v] of recent) if (v.every((t) => now - t >= RATE.windowMs)) recent.delete(k);
+  }
+  return hits.length > RATE.max;
+}
+
+/** Collapse whitespace (including line breaks) and drop control characters. */
+const oneLine = (s: string) => s.replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/\s+/g, " ").trim();
+/** Keep line breaks in the message, drop other control characters. */
+const clean = (s: string) => s.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "").trim();
+
+const fail = (message: string, status: number) =>
+  NextResponse.json({ success: false, message }, { status, headers: { "Cache-Control": "no-store" } });
+
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, email, message, honeypot } = body;
-
-    // Honeypot anti-spam check
-    if (honeypot) {
-      return NextResponse.json(
-        { success: false, message: "Spam detected." },
-        { status: 400 }
-      );
+    // Same-site check: browsers always send Origin on a POST from fetch().
+    const origin = request.headers.get("origin");
+    const host = request.headers.get("host");
+    let originHost = "";
+    try {
+      originHost = origin ? new URL(origin).host : "";
+    } catch {
+      originHost = "";
+    }
+    if (!origin || !host || originHost !== host) {
+      return fail("This form only accepts messages sent from this website.", 403);
     }
 
-    // Input Validation
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
-      return NextResponse.json(
-        { success: false, message: "Name is required." },
-        { status: 400 }
-      );
+    if (!(request.headers.get("content-type") ?? "").includes("application/json")) {
+      return fail("Unsupported request.", 415);
     }
 
-    if (
-      !email ||
-      typeof email !== "string" ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    ) {
-      return NextResponse.json(
-        { success: false, message: "A valid email address is required." },
-        { status: 400 }
-      );
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+    if (rateLimited(ip)) {
+      return fail("That's a lot of messages in a short time. Please wait a few minutes and try again.", 429);
     }
 
-    if (!message || typeof message !== "string" || message.trim().length < 5) {
-      return NextResponse.json(
-        { success: false, message: "Message must be at least 5 characters." },
-        { status: 400 }
-      );
+    const raw = await request.text();
+    if (raw.length > LIMITS.body) return fail("That message is too long.", 413);
+
+    let body: unknown;
+    try {
+      body = JSON.parse(raw);
+    } catch {
+      return fail("Unsupported request.", 400);
+    }
+    if (!body || typeof body !== "object" || Array.isArray(body)) return fail("Unsupported request.", 400);
+    const { name, email, message, honeypot } = body as Record<string, unknown>;
+
+    // Honeypot: a hidden field real visitors never fill in.
+    if (honeypot) return fail("Spam detected.", 400);
+
+    if (typeof name !== "string" || oneLine(name).length === 0) return fail("Name is required.", 400);
+    if (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return fail("A valid email address is required.", 400);
+    }
+    if (typeof message !== "string" || clean(message).length < 5) {
+      return fail("Message must be at least 5 characters.", 400);
     }
 
-    // Email delivery via FormSubmit. It rejects requests that don't say which site they came
-    // from, so forward the visitor's page origin (falling back to this request's own origin).
-    const siteOrigin =
-      request.headers.get("origin") ?? new URL(request.url).origin;
+    const safeName = oneLine(name);
+    const safeEmail = oneLine(email);
+    const safeMessage = clean(message);
+    if (safeName.length > LIMITS.name) return fail(`Please keep your name under ${LIMITS.name} characters.`, 400);
+    if (safeEmail.length > LIMITS.email) return fail("That email address is too long.", 400);
+    if (safeMessage.length > LIMITS.message) {
+      return fail(`Please keep your message under ${LIMITS.message.toLocaleString("en")} characters.`, 400);
+    }
+
+    // FormSubmit wants to know which site a message came from. Use this site's own origin,
+    // checked above, never a value the visitor could choose.
+    const siteOrigin = `${new URL(request.url).protocol}//${host}`;
 
     let delivered = false;
     let reason = "";
@@ -56,11 +110,11 @@ export async function POST(request: Request) {
           Referer: `${siteOrigin}/`,
         },
         body: JSON.stringify({
-          name,
-          email,
-          message,
-          _replyto: email,
-          _subject: `Portfolio Message from ${name}`,
+          name: safeName,
+          email: safeEmail,
+          message: safeMessage,
+          _replyto: safeEmail,
+          _subject: `Portfolio message from ${safeName}`,
           _template: "table",
           _captcha: "false",
         }),
@@ -71,39 +125,30 @@ export async function POST(request: Request) {
       delivered = emailResponse.ok && String(emailResult.success) === "true";
       if (!delivered) {
         reason = String(emailResult.message ?? `HTTP ${emailResponse.status}`);
-        console.error("FormSubmit API Error:", emailResult);
+        console.error("FormSubmit error:", reason);
       }
     } catch (err) {
       reason = "email service unreachable";
-      console.error("Email dispatch exception:", err);
+      console.error("Email dispatch failed:", err instanceof Error ? err.message : "unknown error");
     }
 
     // Only claim success when the email service actually accepted the message.
     if (!delivered) {
       const needsActivation = /activat/i.test(reason);
-      return NextResponse.json(
-        {
-          success: false,
-          message: needsActivation
-            ? "The contact form is being set up and can't deliver messages yet. Please email me directly for now."
-            : "Your message couldn't be sent right now. Please try again, or email me directly.",
-        },
-        { status: 502 }
+      return fail(
+        needsActivation
+          ? "The contact form is being set up and can't deliver messages yet. Please email me directly for now."
+          : "Your message couldn't be sent right now. Please try again, or email me directly.",
+        502
       );
     }
 
     return NextResponse.json(
-      {
-        success: true,
-        message: "Thanks! Your message is on its way to my inbox.",
-      },
-      { status: 200 }
+      { success: true, message: "Thanks! Your message is on its way to my inbox." },
+      { status: 200, headers: { "Cache-Control": "no-store" } }
     );
   } catch (error) {
-    console.error("Error in contact API route:", error);
-    return NextResponse.json(
-      { success: false, message: "Internal server error. Please try again later." },
-      { status: 500 }
-    );
+    console.error("Contact API error:", error instanceof Error ? error.message : "unknown error");
+    return fail("Something went wrong. Please try again later.", 500);
   }
 }
