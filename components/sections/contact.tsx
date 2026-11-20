@@ -17,12 +17,6 @@ const socialLinks = [
   },
 ];
 
-/* Show only the country code and last three digits until someone asks for the number. */
-function maskPhone(phone: string) {
-  const digits = phone.replace(/\D/g, "");
-  return `+${digits.slice(0, 2)} ••••• ••${digits.slice(-3)}`;
-}
-
 const whatsappUrl = `https://wa.me/${PERSONAL_INFO.whatsapp}?text=${encodeURIComponent(
   "Hi Sathwik, I came across your portfolio and would like to connect."
 )}`;
@@ -39,7 +33,6 @@ export function Contact() {
     type: "success" | "error" | null;
     message: string;
   }>({ type: null, message: "" });
-  const [showPhone, setShowPhone] = useState(false);
   const [copied, setCopied] = useState(false);
   /* Only the API's own validation errors mark fields invalid; network and server failures do not. */
   const [hasFieldErrors, setHasFieldErrors] = useState(false);
@@ -136,25 +129,6 @@ export function Contact() {
             </div>
 
             <dl className="rows m-0 border-y border-rule">
-              <div className="grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-4 py-3">
-                <dt className="label">Phone</dt>
-                <dd className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1">
-                  {showPhone ? (
-                    <a href={`tel:${PERSONAL_INFO.phone.replace(/\s+/g, "")}`} className="link font-mono text-sm">
-                      {PERSONAL_INFO.phone}
-                    </a>
-                  ) : (
-                    <>
-                      <span className="font-mono text-sm text-ink-2" aria-hidden="true">
-                        {maskPhone(PERSONAL_INFO.phone)}
-                      </span>
-                      <button type="button" onClick={() => setShowPhone(true)} className="link inline-flex min-h-11 items-center text-sm">
-                        Show phone number
-                      </button>
-                    </>
-                  )}
-                </dd>
-              </div>
               <div className="grid grid-cols-[6rem_minmax(0,1fr)] gap-4 py-3">
                 <dt className="label">Location</dt>
                 <dd className="m-0 text-ink-2">{PERSONAL_INFO.location}</dd>
